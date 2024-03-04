@@ -5,6 +5,7 @@ import 'dotenv/config';
 import cors from 'cors';
 import authRoute from './routes/auth.route';
 import languageRoute from './routes/language.route';
+import tournamentRoute from './routes/tournament.route';
 import { AppDataSource } from './config/db';
 
 i18next
@@ -56,6 +57,7 @@ app.use(
 app.options('*', cors());
 
 app.use('/api/auth', authRoute);
+app.use('/api/tournament', tournamentRoute);
 app.use('/api/language', languageRoute);
 
 app.listen(port, () => {
