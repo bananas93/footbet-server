@@ -1,0 +1,29 @@
+# Logs
+logs
+*.log
+
+# Dependency directories
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+
+# IDE files
+.vscode/
+.idea/
+
+# Compiled TypeScript files
+*.js
+*.js.map
+
+# TypeScript declaration files
+*.d.ts
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
