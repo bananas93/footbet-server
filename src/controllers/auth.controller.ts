@@ -34,6 +34,10 @@ class AuthController {
   async getUser(req: Request, res: Response): Promise<Response> {
     try {
       const { id } = req.params;
+      const language = req.language; // 'de-CH'
+      const languages = req.languages; // ['de-CH', 'de', 'en']
+      console.log('language', language);
+      console.log('languages', languages);
       const user = await AuthService.getUser(Number(id));
       return res.status(200).json(user);
     } catch (err: any) {

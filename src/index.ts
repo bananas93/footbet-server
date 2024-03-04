@@ -1,12 +1,37 @@
 import express, { type Express } from 'express';
+import i18next from 'i18next';
+import localizationMiddleware from 'i18next-http-middleware';
 import 'dotenv/config';
 import cors from 'cors';
 import authRoute from './routes/auth.route';
+import languageRoute from './routes/language.route';
 import { AppDataSource } from './config/db';
+
+i18next
+  .use(localizationMiddleware.LanguageDetector)
+  .init({
+    fallbackLng: ['en', 'uk'],
+    preload: ['en', 'uk'],
+    resources: {
+      en: require('./locales/en.json'),
+      uk: require('./locales/uk.json'),
+    },
+  })
+  .then(() => {
+    console.log('i18next initialized');
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 
 const app: Express = express();
 
-// Rest of your code...
+app.use(
+  localizationMiddleware.handle(i18next, {
+    removeLngFromUrl: false,
+  }),
+);
+
 const port = process.env.PORT ?? '3000';
 
 AppDataSource.initialize()
@@ -31,6 +56,7 @@ app.use(
 app.options('*', cors());
 
 app.use('/api/auth', authRoute);
+app.use('/api/language', languageRoute);
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);

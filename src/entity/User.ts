@@ -26,6 +26,9 @@ export class User {
   @Column({ nullable: true })
   resetToken?: string;
 
+  @Column({ default: 'en' })
+  language: string;
+
   @OneToMany(() => Predict, (predict) => predict.user)
   predicts: Predict[];
 
