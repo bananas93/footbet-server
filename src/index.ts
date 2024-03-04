@@ -1,11 +1,21 @@
 import express, { type Express } from 'express';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import cors from 'cors';
 import authRoute from './routes/auth.route';
+import { AppDataSource } from './config/db';
 
-dotenv.config();
 const app: Express = express();
+
+// Rest of your code...
 const port = process.env.PORT ?? '3000';
+
+AppDataSource.initialize()
+  .then(() => {
+    console.log('[db]: Database connected');
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 
 app.use(express.json());
 app.disable('x-powered-by');

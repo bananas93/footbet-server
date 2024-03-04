@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import passport from 'passport';
 import AuthController from '../controllers/auth.controller';
 import AuthService from '../services/auth.service';
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
+import { Passport } from 'passport';
 
 const router: Router = Router();
+
+const passport = new Passport();
 
 passport.use(
   new GoogleStrategy(
@@ -22,6 +24,7 @@ passport.use(
 
 router.post('/', async (req, res) => await AuthController.createUser(req, res)); // Create a new user
 router.post('/login', async (req, res) => await AuthController.loginUser(req, res)); // Login user
+router.get('/:id', async (req, res) => await AuthController.getUser(req, res)); // Get user
 router.put('/:id', async (req, res) => await AuthController.editUser(req, res)); // Edit user
 router.post('/forgot-password', async (req, res) => await AuthController.forgotPassword(req, res)); // Forgot password
 router.post('/change-password', async (req, res) => await AuthController.changePassword(req, res)); // Change password

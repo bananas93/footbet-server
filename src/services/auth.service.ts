@@ -3,7 +3,7 @@ import jwt, { type JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-import dataSource from '../config/db';
+import { AppDataSource } from '../config/db';
 import { User } from '../entity/User';
 import {
   checkEmail,
@@ -11,14 +11,14 @@ import {
   createPasswordHash,
   generateAccessToken,
   generateRefreshToken,
-} from 'src/utils/userUtils';
+} from '../utils/userUtils';
 import { type Repository } from 'typeorm';
 
 class AuthService {
   private readonly userRepository: Repository<User>;
 
   constructor() {
-    this.userRepository = dataSource.getRepository(User);
+    this.userRepository = AppDataSource.getRepository(User);
   }
 
   async createUser(data: Record<string, any>): Promise<{
@@ -47,7 +47,7 @@ class AuthService {
       const accessToken = await generateAccessToken(user.id);
       const refreshToken = await generateRefreshToken(user.id);
       return { accessToken, refreshToken };
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
@@ -68,7 +68,7 @@ class AuthService {
       const accessToken = await generateAccessToken(user.id);
       const refreshToken = await generateRefreshToken(user.id);
       return { accessToken, refreshToken };
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
@@ -79,18 +79,20 @@ class AuthService {
       if (!user) {
         throw new Error('User not found');
       }
-      const isValidPassword = checkPassword(data.password);
-      if (!isValidPassword) {
-        throw new Error(
-          'Password must be at least 8 characters long containing at least one number and one capital letter',
-        );
+      if (data.password) {
+        const isValidPassword = checkPassword(data.password);
+        if (!isValidPassword) {
+          throw new Error(
+            'Password must be at least 8 characters long containing at least one number and one capital letter',
+          );
+        }
+        const hash = createPasswordHash(data.password);
+        data.password = hash;
       }
-      const hash = createPasswordHash(data.password);
-      data.password = hash;
       await this.userRepository.update({ id }, data);
       const editedUser = await this.userRepository.findOne({ where: { id } });
       return editedUser;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
@@ -124,7 +126,7 @@ class AuthService {
 
       await transporter.sendMail(mailOptions);
       return 'Password reset email sent';
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
@@ -151,7 +153,7 @@ class AuthService {
       };
       await this.userRepository.update({ resetToken: token }, data);
       return 'Password reset successfully';
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
@@ -166,7 +168,7 @@ class AuthService {
         throw new Error('Invalid token or token expired');
       }
       return 'Token is valid';
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
@@ -178,7 +180,7 @@ class AuthService {
         throw new Error('User not found');
       }
       return user;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
@@ -190,7 +192,7 @@ class AuthService {
         throw new Error('User not found');
       }
       await this.userRepository.delete({ id });
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
@@ -200,7 +202,7 @@ class AuthService {
       const accessToken = await generateAccessToken(user.id);
       const refreshToken = await generateRefreshToken(user.id);
       return { accessToken, refreshToken };
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
@@ -216,7 +218,7 @@ class AuthService {
       }
       await this.userRepository.update({ email }, { googleId: id });
       return user;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
@@ -229,8 +231,8 @@ class AuthService {
       }
       const decoded: JwtPayload = jwt.verify(refreshToken, process.env.JWT_SECRET) as JwtPayload;
       const accessToken = generateAccessToken(decoded.id);
-      return accessToken;
-    } catch (error) {
+      return await accessToken;
+    } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
