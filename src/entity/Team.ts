@@ -2,8 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { Match } from './Match';
 
 export enum TeamType {
-  CLUB = 'CLUB',
-  NATIONAL = 'NATIONAL',
+  CLUB = 'club',
+  NATIONAL = 'national',
 }
 
 @Entity()
