@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Predict } from './Predict';
 import { Notification } from './Notification';
+import { Achievement } from './Achievement';
 
 @Entity()
 export class User {
@@ -30,6 +31,9 @@ export class User {
 
   @OneToMany(() => Notification, (notification) => notification.user)
   notifications: Notification[];
+
+  @OneToMany(() => Achievement, (achievement) => achievement.user)
+  achievements: Achievement[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
