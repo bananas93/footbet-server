@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Predict } from './Predict';
+import { Notification } from './Notification';
 
 @Entity()
 export class User {
@@ -22,6 +24,12 @@ export class User {
 
   @Column({ nullable: true })
   resetToken?: string;
+
+  @OneToMany(() => Predict, (predict) => predict.user)
+  predicts: Predict[];
+
+  @OneToMany(() => Notification, (notification) => notification.user)
+  notifications: Notification[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
