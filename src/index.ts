@@ -7,6 +7,7 @@ import authRoute from './routes/auth.route';
 import languageRoute from './routes/language.route';
 import tournamentRoute from './routes/tournament.route';
 import teamRoute from './routes/team.route';
+import matchRoute from './routes/match.route';
 import { AppDataSource } from './config/db';
 
 i18next
@@ -60,6 +61,7 @@ app.options('*', cors());
 app.use('/api/auth', authRoute);
 app.use('/api/tournament', tournamentRoute);
 app.use('/api/team', teamRoute);
+app.use('/api/match', matchRoute);
 app.use('/api/language', languageRoute);
 
 app.listen(port, () => {

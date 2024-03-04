@@ -34,13 +34,6 @@ export enum MatchStatus {
   POSTPONED = 'Postponed',
 }
 
-export enum MatchType {
-  GROUP = 'Group',
-  KNOCKOUT = 'Knockout',
-  FINAL = 'Final',
-  THIRD_PLACE_PLAYOFF = 'Third Place Playoff',
-}
-
 export enum MatchGroupName {
   A = 'A',
   B = 'B',
@@ -69,21 +62,14 @@ export class Match {
     enum: MatchStatus,
     default: MatchStatus.SCHEDULED,
   })
-  matchStatus: MatchStatus;
-
-  @Column({
-    type: 'enum',
-    enum: MatchType,
-    default: MatchType.GROUP,
-  })
-  matchType: MatchType;
+  status: MatchStatus;
 
   @Column({
     type: 'enum',
     enum: MatchResult,
     nullable: true,
   })
-  matchResult: MatchResult;
+  result: MatchResult;
 
   @Column({
     type: 'enum',
