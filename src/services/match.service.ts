@@ -1,6 +1,8 @@
+import { type EntityManager, type Repository } from 'typeorm';
+import { Predict } from '../entity/Predict';
 import { AppDataSource } from '../config/db';
-import { Match, MatchStage, type MatchStatus, type MatchGroupName } from '../entity/Match';
-import { type Repository } from 'typeorm';
+import PointsCalculator from '../utils/calculate';
+import { Match, MatchStage, MatchStatus, type MatchGroupName } from '../entity/Match';
 
 export interface MatchPayload {
   stage: MatchStage;
@@ -24,9 +26,11 @@ export interface MatchResponse {
 
 class MatchService {
   private readonly matchRepository: Repository<Match>;
+  private readonly predictRepository: Repository<Predict>;
 
   constructor() {
     this.matchRepository = AppDataSource.getRepository(Match);
+    this.predictRepository = AppDataSource.getRepository(Predict);
   }
 
   async getAllMatches(): Promise<MatchResponse[]> {
@@ -149,13 +153,56 @@ class MatchService {
   }
 
   async updateMatch(id: number, data: MatchPayload): Promise<Match> {
+    const entityManager: EntityManager = this.matchRepository.manager;
+
     try {
-      await this.matchRepository.update(id, data);
-      const match = await this.matchRepository.findOne({ where: { id } });
-      if (!match) {
+      await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
+        // Update the match
+        await transactionalEntityManager.update(Match, id, data);
+
+        // Fetch the updated match
+        const updatedMatch = await transactionalEntityManager.findOne(Match, { where: { id } });
+
+        if (!updatedMatch) {
+          throw new Error('Match not found');
+        }
+
+        // Calculate points and update predictions if the match is in progress or finished
+        if ([MatchStatus.IN_PROGRESS, MatchStatus.FINISHED].includes(updatedMatch.status)) {
+          const predictions = await this.predictRepository.find({ where: { matchId: id } });
+
+          // Calculate points for each prediction and update the points in
+          console.log('prediction', predictions);
+          for (const prediction of predictions) {
+            const result = PointsCalculator.calculatePointsForPrediction(updatedMatch, prediction);
+
+            if (typeof result === 'number') {
+              // Handle the case where result is 0 (or any other numeric value) if needed
+              console.log('Points earned:', result);
+            } else {
+              const { totalPoints, exactScorePoints, matchResultPoints, goalsDifferencePoints, fivePlusGoalsPoints } =
+                result;
+
+              // Update the points in the Predict entity
+              await transactionalEntityManager.update(Predict, prediction.id, {
+                points: +totalPoints,
+                correctScore: +exactScorePoints,
+                correctDifference: +goalsDifferencePoints,
+                fivePlusGoals: +fivePlusGoalsPoints,
+                correctResult: +matchResultPoints,
+              });
+            }
+          }
+        }
+      });
+
+      // Fetch the final updated match
+      const finalUpdatedMatch = await entityManager.findOne(Match, { where: { id } });
+      if (!finalUpdatedMatch) {
         throw new Error('Match not found');
       }
-      return match;
+
+      return finalUpdatedMatch;
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }

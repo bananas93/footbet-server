@@ -45,7 +45,7 @@ export enum MatchResult {
 
 export enum MatchStatus {
   SCHEDULED = 'Scheduled',
-  IN_PROGRESS = 'In Progress',
+  IN_PROGRESS = 'Live',
   FINISHED = 'Finished',
   POSTPONED = 'Postponed',
 }

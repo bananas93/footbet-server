@@ -32,16 +32,16 @@ export class Predict {
 
   // Additional detailed results
   @Column({ nullable: true })
-  correctScore: boolean;
+  correctScore: number;
 
   @Column({ nullable: true })
-  correctDifference: boolean;
+  correctDifference: number;
 
   @Column({ nullable: true })
-  fivePlusGoals: boolean;
+  fivePlusGoals: number;
 
   @Column({ nullable: true })
-  correctResult: boolean;
+  correctResult: number;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
