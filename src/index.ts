@@ -9,6 +9,7 @@ import tournamentRoute from './routes/tournament.route';
 import teamRoute from './routes/team.route';
 import matchRoute from './routes/match.route';
 import predictRoute from './routes/predict.route';
+import leaderboardRoute from './routes/leaderboard.route';
 import { AppDataSource } from './config/db';
 
 i18next
@@ -63,6 +64,7 @@ app.use('/api/auth', authRoute);
 app.use('/api/tournament', tournamentRoute);
 app.use('/api/team', teamRoute);
 app.use('/api/match', matchRoute);
+app.use('/api/leaderboard', leaderboardRoute);
 app.use('/api/predict', predictRoute);
 app.use('/api/language', languageRoute);
 

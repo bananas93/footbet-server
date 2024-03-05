@@ -18,9 +18,15 @@ class PointsCalculator {
     return new PointsCalculator();
   }
 
-  calculatePointsForPrediction(match: Match, prediction: Predict): 0 | CalculateResult {
+  calculatePointsForPrediction(match: Match, prediction: Predict): CalculateResult {
     if (![MatchStatus.IN_PROGRESS, MatchStatus.FINISHED].includes(match.status)) {
-      return 0;
+      return {
+        totalPoints: 0,
+        exactScorePoints: 0,
+        matchResultPoints: 0,
+        goalsDifferencePoints: 0,
+        fivePlusGoalsPoints: 0,
+      };
     }
 
     const exactScorePoints = this.calculateExactScorePoints(match, prediction);
@@ -49,7 +55,7 @@ class PointsCalculator {
     const goalsDifferenceMatch = Math.abs(match.homeScore - match.awayScore);
     const goalsDifferencePrediction = Math.abs(prediction.homeScore - prediction.awayScore);
 
-    return goalsDifferenceMatch === goalsDifferencePrediction ? 1 : 0;
+    return goalsDifferenceMatch === goalsDifferencePrediction ? 3 : 0;
   }
 
   private calculateFivePlusGoalsPoints(match: Match, prediction: Predict): number {
