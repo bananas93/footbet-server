@@ -14,11 +14,27 @@ import { Predict } from './Predict';
 
 export enum MatchStage {
   GROUP_STAGE = 'Group Stage',
+  KNOCKOUT_PLAYOFF = 'Knockout Playoff',
   ROUND_OF_16 = 'Round of 16',
   QUARTERFINALS = 'Quarterfinals',
   SEMIFINALS = 'Semifinals',
   FINAL = 'Final',
   THIRD_PLACE_PLAYOFF = 'Third Place Playoff',
+}
+
+export enum MatchGroupTour {
+  FIRST = '1 tour',
+  SECOND = '2 tour',
+  THIRD = '3 tour',
+  FOURTH = '4 tour',
+  FIFTH = '5 tour',
+  SIXTH = '6 tour',
+  SEVENTH = '7 tour',
+  EIGHTH = '8 tour',
+  NINTH = '9 tour',
+  TENTH = '10 tour',
+  ELEVENTH = '11 tour',
+  TWELFTH = '12 tour',
 }
 
 export enum MatchResult {
@@ -56,6 +72,13 @@ export class Match {
     default: MatchStage.GROUP_STAGE,
   })
   stage: MatchStage;
+
+  @Column({
+    type: 'enum',
+    enum: MatchGroupTour,
+    nullable: true,
+  })
+  groupTour: MatchGroupTour;
 
   @Column({
     type: 'enum',

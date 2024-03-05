@@ -1,5 +1,5 @@
 import { AppDataSource } from '../config/db';
-import { Match, type MatchStage, type MatchStatus, type MatchGroupName } from '../entity/Match';
+import { Match, MatchStage, type MatchStatus, type MatchGroupName } from '../entity/Match';
 import { type Repository } from 'typeorm';
 
 export interface MatchPayload {
@@ -14,6 +14,14 @@ export interface MatchPayload {
   awayTeamId: number;
 }
 
+export interface MatchResponse {
+  id: number;
+  stage: MatchStage;
+  tour: string;
+  date: string;
+  games: Match[];
+}
+
 class MatchService {
   private readonly matchRepository: Repository<Match>;
 
@@ -21,17 +29,19 @@ class MatchService {
     this.matchRepository = AppDataSource.getRepository(Match);
   }
 
-  async getAllMatches(): Promise<Match[]> {
+  async getAllMatches(): Promise<MatchResponse[]> {
     try {
       const matches = await this.matchRepository.find({
         relations: {
           homeTeam: true,
           awayTeam: true,
           tournament: true,
+          predicts: true,
         },
         select: {
           id: true,
           stage: true,
+          groupTour: true,
           status: true,
           result: true,
           groupName: true,
@@ -55,7 +65,28 @@ class MatchService {
       if (!matches) {
         return [];
       }
-      return matches;
+
+      const groupedMatches: Record<string, Match[]> = {};
+
+      matches.forEach((match) => {
+        const key = match.stage === MatchStage.GROUP_STAGE ? `${match.stage}_${match.groupTour}` : match.stage;
+
+        if (!groupedMatches[key]) {
+          groupedMatches[key] = [];
+        }
+
+        groupedMatches[key].push(match);
+      });
+
+      const groupArrays: MatchResponse[] = Object.keys(groupedMatches).map((key, index) => ({
+        id: index + 1,
+        stage: groupedMatches[key][0].stage,
+        date: groupedMatches[key][0].matchDate.toISOString().split('T')[0],
+        tour: groupedMatches[key][0].groupTour || null,
+        games: groupedMatches[key],
+      }));
+
+      return groupArrays;
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
@@ -73,6 +104,7 @@ class MatchService {
         select: {
           id: true,
           stage: true,
+          groupTour: true,
           status: true,
           result: true,
           groupName: true,
