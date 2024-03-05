@@ -24,7 +24,7 @@ class TournamentController {
   async createTournament(req: Request, res: Response): Promise<Response> {
     try {
       const tournament = await TournamentService.createTournament(req.body);
-      return res.status(201).json(tournament);
+      return res.status(201).json({ tournament, message: 'Tournament successfully created' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });
     }
@@ -34,7 +34,7 @@ class TournamentController {
     try {
       const { id } = req.params;
       const tournament = await TournamentService.updateTournament(Number(id), req.body);
-      return res.status(200).json(tournament);
+      return res.status(200).json({ tournament, message: 'Tournament successfully updated' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });
     }
@@ -43,8 +43,8 @@ class TournamentController {
   async deleteTournament(req: Request, res: Response): Promise<Response> {
     try {
       const { id } = req.params;
-      const tournament = await TournamentService.deleteTournament(Number(id));
-      return res.status(200).json(tournament);
+      await TournamentService.deleteTournament(Number(id));
+      return res.status(200).json({ message: 'Tournament successfully deleted' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });
     }

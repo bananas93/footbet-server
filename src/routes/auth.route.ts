@@ -1,8 +1,9 @@
 import { Router } from 'express';
+import { Passport } from 'passport';
+import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
 import AuthController from '../controllers/auth.controller';
 import AuthService from '../services/auth.service';
-import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
-import { Passport } from 'passport';
+import checkAuth from '../middlewares/auth.middleware';
 
 const router: Router = Router();
 
@@ -29,7 +30,7 @@ router.put('/:id', async (req, res) => await AuthController.editUser(req, res));
 router.post('/forgot-password', async (req, res) => await AuthController.forgotPassword(req, res)); // Forgot password
 router.post('/change-password', async (req, res) => await AuthController.changePassword(req, res)); // Change password
 router.post('/check-token', async (req, res) => await AuthController.checkResetToken(req, res)); // Check reset token
-router.delete('/:id', async (req, res) => await AuthController.deleteUser(req, res)); // Delete user
+router.delete('/:id', checkAuth, async (req, res) => await AuthController.deleteUser(req, res)); // Delete user
 router.get('/callback', passport.authenticate('google', { failureRedirect: '/' }), async (req, res, next) => {
   await AuthController.authGoogleUser(req, res, next);
 }); // Google auth callback

@@ -24,7 +24,7 @@ class MatchController {
   async createMatch(req: Request, res: Response): Promise<Response> {
     try {
       const match = await MatchService.createMatch(req.body);
-      return res.status(201).json(match);
+      return res.status(201).json({ match, message: 'Match successfully created' });
     } catch (error: any) {
       if (error.message.includes('ER_NO_REFERENCED_ROW_2')) {
         return res.status(400).json({ error: 'Invalid tournamentId, homeTeamId or awayTeamId' });
@@ -40,7 +40,7 @@ class MatchController {
     try {
       const { id } = req.params;
       const match = await MatchService.updateMatch(Number(id), req.body);
-      return res.status(200).json(match);
+      return res.status(200).json({ match, message: 'Match successfully updated' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });
     }
@@ -49,8 +49,8 @@ class MatchController {
   async deleteMatch(req: Request, res: Response): Promise<Response> {
     try {
       const { id } = req.params;
-      const match = await MatchService.deleteMatch(Number(id));
-      return res.status(200).json(match);
+      await MatchService.deleteMatch(Number(id));
+      return res.status(200).json({ message: 'Match successfully deleted' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });
     }

@@ -25,7 +25,7 @@ class TeamController {
   async createTeam(req: Request, res: Response): Promise<Response> {
     try {
       const team = await TeamService.createTeam(req.body);
-      return res.status(201).json(team);
+      return res.status(201).json({ team, message: 'Team successfully created' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });
     }
@@ -35,7 +35,7 @@ class TeamController {
     try {
       const { id } = req.params;
       const team = await TeamService.updateTeam(Number(id), req.body);
-      return res.status(200).json(team);
+      return res.status(200).json({ team, message: 'Team successfully updated' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });
     }
@@ -44,8 +44,8 @@ class TeamController {
   async deleteTeam(req: Request, res: Response): Promise<Response> {
     try {
       const { id } = req.params;
-      const team = await TeamService.deleteTeam(Number(id));
-      return res.status(200).json(team);
+      await TeamService.deleteTeam(Number(id));
+      return res.status(200).json({ message: 'Team successfully deleted' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });
     }
