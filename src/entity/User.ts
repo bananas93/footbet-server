@@ -1,7 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { Predict } from './Predict';
 import { Notification } from './Notification';
 import { Achievement } from './Achievement';
+import { Room } from './Room';
 
 @Entity()
 export class User {
@@ -37,6 +47,13 @@ export class User {
 
   @OneToMany(() => Achievement, (achievement) => achievement.user)
   achievements: Achievement[];
+
+  @ManyToMany(() => Room, (room) => room.participants, { cascade: ['remove'] })
+  @JoinTable()
+  rooms: Room[];
+
+  @OneToMany(() => Room, (room) => room.creator)
+  createdRooms: Room[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
