@@ -1,7 +1,6 @@
 /* eslint-disable no-param-reassign */
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { AppDataSource } from '../config/db';
 import { User } from '../entity/User';
@@ -103,10 +102,10 @@ class AuthService {
       if (!user) {
         throw new Error('User not found');
       }
-      const resetToken = crypto.randomBytes(32).toString('hex');
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
       const data = {
-        resetToken,
+        verificationCode,
       };
       await this.userRepository.update({ email }, data);
       const transporter = nodemailer.createTransport({
@@ -120,50 +119,58 @@ class AuthService {
       const mailOptions = {
         from: 'amerovdavid@gmail.com',
         to: email,
-        subject: 'Password Reset',
-        text: `Click the following link to reset your password: ${process.env.CLIENT_URL}/login/reset-password?token=${resetToken}`,
+        subject: 'Verification Code',
+        text: `Your 6-digit verification code is: ${verificationCode}`,
       };
 
       await transporter.sendMail(mailOptions);
-      return 'Password reset email sent';
+      return 'Verification code sent';
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
 
-  async changePassword(token: string, password: string): Promise<string> {
+  async changePassword(email: string, verificationCode: string, password: string): Promise<string> {
     try {
-      if (!token) {
-        throw new Error('Invalid token');
+      if (!verificationCode) {
+        throw new Error('Invalid verification code');
       }
-      const user = await this.userRepository.findOne({ where: { resetToken: token } });
+
+      const user = await this.userRepository.findOne({ where: { verificationCode, email } });
+
       if (!user) {
-        throw new Error('Invalid token or token expired');
+        throw new Error('Invalid verification code or code expired');
       }
+
       const isValidPassword = checkPassword(password);
+
       if (!isValidPassword) {
         throw new Error(
           'Password must be at least 8 characters long containing at least one number and one capital letter',
         );
       }
+
       const hash = createPasswordHash(password);
+
       const data = {
         password: hash,
-        resetToken: null,
+        verificationCode: null,
       };
-      await this.userRepository.update({ resetToken: token }, data);
+
+      await this.userRepository.update({ verificationCode }, data);
+
       return 'Password reset successfully';
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
   }
 
-  async checkResetToken(token: string): Promise<string> {
+  async checkResetToken(verificationCode: string): Promise<string> {
     try {
-      if (!token) {
+      if (!verificationCode) {
         throw new Error('Invalid token');
       }
-      const user = await this.userRepository.findOne({ where: { resetToken: token } });
+      const user = await this.userRepository.findOne({ where: { verificationCode } });
       if (!user) {
         throw new Error('Invalid token or token expired');
       }

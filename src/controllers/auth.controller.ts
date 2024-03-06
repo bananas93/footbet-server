@@ -77,8 +77,8 @@ class AuthController {
 
   async changePassword(req: Request, res: Response): Promise<Response> {
     try {
-      const { token, password } = req.body;
-      await AuthService.changePassword(token, password);
+      const { email, code, password } = req.body;
+      await AuthService.changePassword(email, code, password);
       return res.status(200).json({ message: 'Password changed' });
     } catch (err: any) {
       if (err.message === 'User not found' || err.message === 'Invalid token') {
@@ -90,8 +90,8 @@ class AuthController {
 
   async checkResetToken(req: Request, res: Response): Promise<Response> {
     try {
-      const { token } = req.body;
-      const message = await AuthService.checkResetToken(token);
+      const { code } = req.body;
+      const message = await AuthService.checkResetToken(code);
       return res.status(200).json({ message });
     } catch (err: any) {
       if (err.message === 'Invalid token') {

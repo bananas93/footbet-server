@@ -34,7 +34,7 @@ export class User {
   password?: string;
 
   @Column({ nullable: true })
-  resetToken?: string;
+  verificationCode?: string;
 
   @Column({ default: 'en' })
   language: string;
