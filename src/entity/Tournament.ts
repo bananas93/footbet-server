@@ -3,8 +3,13 @@ import { Match } from './Match';
 
 export enum TournamentStatus {
   SCHEDULED = 'scheduled',
-  IN_PROGRESS = 'in_progress',
+  IN_PROGRESS = 'live',
   COMPLETED = 'completed',
+}
+
+export enum TournamentType {
+  CLUB = 'club',
+  NATIONAL = 'national',
 }
 
 @Entity()
@@ -23,6 +28,13 @@ export class Tournament {
 
   @Column({ nullable: true })
   knockoutRound: number;
+
+  @Column({
+    type: 'enum',
+    enum: TournamentType,
+    default: TournamentType.CLUB,
+  })
+  type: TournamentType;
 
   @Column({
     type: 'enum',

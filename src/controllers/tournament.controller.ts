@@ -1,10 +1,12 @@
 import { type Request, type Response } from 'express';
 import TournamentService from '../services/tournament.service';
+import { type TournamentType } from 'src/entity/Tournament';
 
 class TournamentController {
   async getTournaments(req: Request, res: Response): Promise<Response> {
     try {
-      const tournaments = await TournamentService.getAllTournaments();
+      const { type } = req.query;
+      const tournaments = await TournamentService.getAllTournaments(type as TournamentType);
       return res.status(200).json(tournaments);
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });

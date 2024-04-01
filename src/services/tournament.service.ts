@@ -1,6 +1,6 @@
-import { AppDataSource } from '../config/db';
-import { Tournament } from '../entity/Tournament';
 import { type Repository } from 'typeorm';
+import { AppDataSource } from '../config/db';
+import { Tournament, type TournamentType } from '../entity/Tournament';
 
 class TournamentService {
   private readonly tournamentRepository: Repository<Tournament>;
@@ -9,9 +9,10 @@ class TournamentService {
     this.tournamentRepository = AppDataSource.getRepository(Tournament);
   }
 
-  async getAllTournaments(): Promise<Tournament[]> {
+  async getAllTournaments(type?: TournamentType): Promise<Tournament[]> {
+    console.log('type', type);
     try {
-      const tournaments = await this.tournamentRepository.find();
+      const tournaments = await this.tournamentRepository.find({ where: { type } });
       if (!tournaments) {
         return [];
       }
