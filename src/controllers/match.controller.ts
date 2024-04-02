@@ -4,7 +4,8 @@ import MatchService from '../services/match.service';
 class MatchController {
   async getAllMatches(req: Request, res: Response): Promise<Response> {
     try {
-      const matches = await MatchService.getAllMatches();
+      const { tournamentId } = req.params;
+      const matches = await MatchService.getAllMatches(Number(tournamentId));
       return res.status(200).json(matches);
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });

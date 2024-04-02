@@ -33,9 +33,10 @@ class MatchService {
     this.predictRepository = AppDataSource.getRepository(Predict);
   }
 
-  async getAllMatches(): Promise<MatchResponse[]> {
+  async getAllMatches(tournamentId: number): Promise<MatchResponse[]> {
     try {
       const matches = await this.matchRepository.find({
+        where: { tournamentId },
         relations: {
           homeTeam: true,
           awayTeam: true,

@@ -10,9 +10,8 @@ class TournamentService {
   }
 
   async getAllTournaments(type?: TournamentType): Promise<Tournament[]> {
-    console.log('type', type);
     try {
-      const tournaments = await this.tournamentRepository.find({ where: { type } });
+      const tournaments = await this.tournamentRepository.find();
       if (!tournaments) {
         return [];
       }
