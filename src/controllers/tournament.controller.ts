@@ -44,8 +44,9 @@ class TournamentController {
 
   async deleteTournament(req: Request, res: Response): Promise<Response> {
     try {
-      const { id } = req.params;
-      await TournamentService.deleteTournament(Number(id));
+      const { tournamentsIds } = req.body;
+      console.log(tournamentsIds);
+      await TournamentService.deleteTournament(tournamentsIds);
       return res.status(200).json({ message: 'Tournament successfully deleted' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });

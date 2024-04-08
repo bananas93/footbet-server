@@ -230,15 +230,22 @@ class AuthService {
     }
   }
 
-  async refreshAccessToken(refreshToken: string, userId: number): Promise<string> {
+  async refreshAccessToken(
+    refreshToken: string,
+    userId: number,
+  ): Promise<{
+    accessToken: string;
+    newRefreshToken: string;
+  }> {
     try {
       const user = await this.userRepository.findOne({ where: { id: userId } });
       if (!user) {
         throw new Error('User not found');
       }
       const decoded: JwtPayload = jwt.verify(refreshToken, process.env.JWT_SECRET) as JwtPayload;
-      const accessToken = generateAccessToken(decoded.id);
-      return await accessToken;
+      const accessToken = await generateAccessToken(decoded.id);
+      const newRefreshToken = await generateRefreshToken(decoded.id);
+      return { accessToken, newRefreshToken };
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }

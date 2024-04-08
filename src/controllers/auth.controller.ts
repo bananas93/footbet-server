@@ -131,8 +131,8 @@ class AuthController {
     const { refreshToken } = req.body;
     try {
       const userId = getUserIdFromRefreshToken(refreshToken);
-      const accessToken = await AuthService.refreshAccessToken(refreshToken, Number(userId));
-      return res.status(201).json({ accessToken });
+      const { accessToken, newRefreshToken } = await AuthService.refreshAccessToken(refreshToken, Number(userId));
+      return res.status(201).json({ accessToken, refreshToken: newRefreshToken });
     } catch (error) {
       return res.status(400).json({ error: 'Invalid refresh token.' });
     }

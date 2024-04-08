@@ -1,4 +1,4 @@
-import { type Repository } from 'typeorm';
+import { In, type Repository } from 'typeorm';
 import { AppDataSource } from '../config/db';
 import { Tournament, type TournamentType } from '../entity/Tournament';
 
@@ -56,14 +56,19 @@ class TournamentService {
     }
   }
 
-  async deleteTournament(id: number): Promise<Tournament> {
+  async deleteTournament(tournamentsIds: number[]): Promise<void> {
     try {
-      const tournament = await this.tournamentRepository.findOne({ where: { id } });
-      if (!tournament) {
-        throw new Error('Tournament not found');
+      const tournaments = await this.tournamentRepository.find({
+        where: { id: In(tournamentsIds) },
+      });
+      if (!tournaments.length) {
+        throw new Error('Tournaments not found');
       }
-      await this.tournamentRepository.delete(id);
-      return tournament;
+      const deleteResult = await this.tournamentRepository.delete({ id: In(tournamentsIds) });
+
+      if (!deleteResult.affected) {
+        throw new Error('Transactions not found');
+      }
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
