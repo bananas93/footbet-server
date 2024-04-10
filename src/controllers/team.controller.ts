@@ -43,8 +43,8 @@ class TeamController {
 
   async deleteTeam(req: Request, res: Response): Promise<Response> {
     try {
-      const { id } = req.params;
-      await TeamService.deleteTeam(Number(id));
+      const { teamsIds } = req.body;
+      await TeamService.deleteTeam(teamsIds);
       return res.status(200).json({ message: 'Team successfully deleted' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });

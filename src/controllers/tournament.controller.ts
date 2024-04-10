@@ -45,7 +45,6 @@ class TournamentController {
   async deleteTournament(req: Request, res: Response): Promise<Response> {
     try {
       const { tournamentsIds } = req.body;
-      console.log(tournamentsIds);
       await TournamentService.deleteTournament(tournamentsIds);
       return res.status(200).json({ message: 'Tournament successfully deleted' });
     } catch (error: any) {

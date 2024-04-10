@@ -67,7 +67,7 @@ class TournamentService {
       const deleteResult = await this.tournamentRepository.delete({ id: In(tournamentsIds) });
 
       if (!deleteResult.affected) {
-        throw new Error('Transactions not found');
+        throw new Error('Tournaments not found');
       }
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');

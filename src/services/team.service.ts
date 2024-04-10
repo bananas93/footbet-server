@@ -1,6 +1,6 @@
 import { AppDataSource } from '../config/db';
 import { Team, TeamType } from '../entity/Team';
-import { type Repository } from 'typeorm';
+import { In, type Repository } from 'typeorm';
 
 class TeamService {
   private readonly teamRepository: Repository<Team>;
@@ -64,14 +64,19 @@ class TeamService {
     }
   }
 
-  async deleteTeam(id: number): Promise<Team> {
+  async deleteTeam(teamsIds: number[]): Promise<void> {
     try {
-      const team = await this.teamRepository.findOne({ where: { id } });
-      if (!team) {
-        throw new Error('Team not found');
+      const teams = await this.teamRepository.find({
+        where: { id: In(teamsIds) },
+      });
+      if (!teams.length) {
+        throw new Error('Teams not found');
       }
-      await this.teamRepository.delete(id);
-      return team;
+      const deleteResult = await this.teamRepository.delete({ id: In(teamsIds) });
+
+      if (!deleteResult.affected) {
+        throw new Error('Teams not found');
+      }
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
