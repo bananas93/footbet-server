@@ -5,7 +5,8 @@ class MatchController {
   async getAllMatches(req: Request, res: Response): Promise<Response> {
     try {
       const { tournamentId } = req.params;
-      const matches = await MatchService.getAllMatches(Number(tournamentId));
+      const { flat } = req.query;
+      const matches = await MatchService.getAllMatches(Number(tournamentId), !!flat);
       return res.status(200).json(matches);
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });
