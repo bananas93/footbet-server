@@ -21,6 +21,7 @@ class TeamService {
 
       const teams = await this.teamRepository.find({
         where: whereClause,
+        order: { name: 'ASC' },
       });
 
       return teams;
@@ -41,9 +42,17 @@ class TeamService {
     }
   }
 
-  async createTeam(data: Record<string, any>): Promise<Team> {
+  async createTeam(data: Record<string, any>, filename: string): Promise<Team> {
     try {
-      const team = this.teamRepository.create(data);
+      const teamExists = await this.teamRepository.findOne({ where: { name: data.name } });
+      if (teamExists) {
+        throw new Error('Team already exists');
+      }
+      let newData = { ...data };
+      if (filename) {
+        newData = { ...data, logo: filename };
+      }
+      const team = this.teamRepository.create(newData);
       await this.teamRepository.save(team);
       return team;
     } catch (error: any) {
@@ -51,9 +60,13 @@ class TeamService {
     }
   }
 
-  async updateTeam(id: number, data: Record<string, any>): Promise<Team> {
+  async updateTeam(id: number, data: Record<string, any>, filename: string): Promise<Team> {
     try {
-      await this.teamRepository.update(id, data);
+      let newData = { ...data };
+      if (filename) {
+        newData = { ...data, logo: filename };
+      }
+      await this.teamRepository.update(id, newData);
       const team = await this.teamRepository.findOne({ where: { id } });
       if (!team) {
         throw new Error('Team not found');

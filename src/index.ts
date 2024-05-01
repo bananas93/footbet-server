@@ -12,6 +12,7 @@ import predictRoute from './routes/predict.route';
 import roomRoute from './routes/room.route';
 import leaderboardRoute from './routes/leaderboard.route';
 import { AppDataSource } from './config/db';
+import path from 'path';
 
 i18next
   .use(localizationMiddleware.LanguageDetector)
@@ -60,6 +61,8 @@ app.use(
   }),
 );
 app.options('*', cors());
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoute);
 app.use('/api/tournament', tournamentRoute);
