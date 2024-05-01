@@ -1,4 +1,4 @@
-import { type EntityManager, type Repository } from 'typeorm';
+import { In, type EntityManager, type Repository } from 'typeorm';
 import { Predict } from '../entity/Predict';
 import { AppDataSource } from '../config/db';
 import PointsCalculator from '../utils/calculate';
@@ -214,14 +214,19 @@ class MatchService {
     }
   }
 
-  async deleteMatch(id: number): Promise<boolean> {
+  async deleteMatch(matchesIds: number[]): Promise<void> {
     try {
-      const match = await this.matchRepository.findOne({ where: { id } });
-      if (!match) {
-        throw new Error('Match not found');
+      const matches = await this.matchRepository.find({
+        where: { id: In(matchesIds) },
+      });
+
+      if (!matches.length) {
+        throw new Error('Matches not found');
       }
-      await this.matchRepository.delete(id);
-      return true;
+      const deleteResult = await this.matchRepository.delete({ id: In(matchesIds) });
+      if (!deleteResult.affected) {
+        throw new Error('Matches not found');
+      }
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }

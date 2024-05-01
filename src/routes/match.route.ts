@@ -8,6 +8,6 @@ router.get('/all/:tournamentId?', checkAuth, async (req, res) => await MatchCont
 router.get('/:id', checkAuth, async (req, res) => await MatchController.getMatchById(req, res)); // Get match by id
 router.post('/', checkAuth, async (req, res) => await MatchController.createMatch(req, res)); // Create a new match
 router.put('/:id', checkAuth, async (req, res) => await MatchController.updateMatch(req, res)); // Update match
-router.delete('/:id', checkAuth, async (req, res) => await MatchController.deleteMatch(req, res)); // Delete match
+router.delete('/', checkAuth, async (req, res) => await MatchController.deleteMatch(req, res)); // Delete match
 
 export default router;

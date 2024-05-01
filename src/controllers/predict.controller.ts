@@ -44,8 +44,8 @@ class PredictController {
 
   async deletePredict(req: Request, res: Response): Promise<Response> {
     try {
-      const { id } = req.params;
-      await PredictService.deletePredict(Number(id));
+      const { predictsIds } = req.body;
+      await PredictService.deletePredict(predictsIds);
       return res.status(200).json({ message: 'Predict successfully deleted' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });

@@ -50,8 +50,8 @@ class MatchController {
 
   async deleteMatch(req: Request, res: Response): Promise<Response> {
     try {
-      const { id } = req.params;
-      await MatchService.deleteMatch(Number(id));
+      const { matchesIds } = req.body;
+      await MatchService.deleteMatch(matchesIds);
       return res.status(200).json({ message: 'Match successfully deleted' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });

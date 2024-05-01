@@ -131,7 +131,7 @@ export class Match {
   @JoinColumn({ name: 'awayTeamId' })
   awayTeam: Team;
 
-  @OneToMany(() => Predict, (predict) => predict.match)
+  @OneToMany(() => Predict, (predict) => predict.match, { cascade: ['remove'] })
   predicts: Predict[];
 
   @CreateDateColumn({ name: 'created_at' })

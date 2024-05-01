@@ -1,6 +1,6 @@
 import { Predict } from '../entity/Predict';
 import { AppDataSource } from '../config/db';
-import { type Repository } from 'typeorm';
+import { In, type Repository } from 'typeorm';
 
 export interface PredictPayload {
   matchId: number;
@@ -18,20 +18,21 @@ class PredictService {
   async getAllPredicts(): Promise<Predict[]> {
     try {
       const predicts = await this.predictRepository.find({
-        relations: {
-          match: true,
-          user: true,
-        },
+        relations: ['match', 'user', 'match.homeTeam', 'match.awayTeam'],
         select: {
           match: {
             id: true,
-            stage: true,
-            groupTour: true,
             status: true,
-            groupName: true,
+            homeTeam: {
+              id: true,
+              name: true,
+            },
+            awayTeam: {
+              id: true,
+              name: true,
+            },
             homeScore: true,
             awayScore: true,
-            matchDate: true,
           },
           user: {
             id: true,
@@ -132,14 +133,19 @@ class PredictService {
     }
   }
 
-  async deletePredict(id: number): Promise<boolean> {
+  async deletePredict(predictsIds: number[]): Promise<void> {
     try {
-      const predict = await this.predictRepository.findOne({ where: { id } });
-      if (!predict) {
-        return false;
+      const predicts = await this.predictRepository.find({
+        where: { id: In(predictsIds) },
+      });
+
+      if (!predicts.length) {
+        throw new Error('Predicts not found');
       }
-      await this.predictRepository.delete(id);
-      return true;
+      const deleteResult = await this.predictRepository.delete({ id: In(predictsIds) });
+      if (!deleteResult.affected) {
+        throw new Error('Predicts not found');
+      }
     } catch (error: any) {
       throw new Error(error);
     }
