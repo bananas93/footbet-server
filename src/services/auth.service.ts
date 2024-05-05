@@ -72,6 +72,18 @@ class AuthService {
     }
   }
 
+  async getUsers(): Promise<User[]> {
+    try {
+      const users = await this.userRepository.find({ select: ['id', 'name', 'email', 'phone', 'createdAt'] });
+      if (!users) {
+        return [];
+      }
+      return users;
+    } catch (error: any) {
+      throw new Error(error.message || 'An error occurred in the service layer');
+    }
+  }
+
   async editUser(id: number, data: Record<string, any>): Promise<User> {
     try {
       const user = await this.userRepository.findOne({ where: { id } });

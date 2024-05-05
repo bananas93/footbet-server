@@ -25,6 +25,7 @@ passport.use(
 
 router.post('/', async (req, res) => await AuthController.createUser(req, res)); // Create a new user
 router.post('/login', async (req, res) => await AuthController.loginUser(req, res)); // Login user
+router.get('/', checkAuth, async (req, res) => await AuthController.getUsers(req, res)); // Get all users
 router.get('/:id', checkAuth, async (req, res) => await AuthController.getUser(req, res)); // Get user
 router.put('/:id', checkAuth, async (req, res) => await AuthController.editUser(req, res)); // Edit user
 router.post('/forgot-password', async (req, res) => await AuthController.forgotPassword(req, res)); // Forgot password
