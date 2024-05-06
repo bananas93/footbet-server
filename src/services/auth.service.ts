@@ -74,7 +74,9 @@ class AuthService {
 
   async getUsers(): Promise<User[]> {
     try {
-      const users = await this.userRepository.find({ select: ['id', 'name', 'email', 'phone', 'createdAt'] });
+      const users = await this.userRepository.find({
+        select: ['id', 'name', 'email', 'phone', 'googleId', 'createdAt'],
+      });
       if (!users) {
         return [];
       }
