@@ -3,6 +3,7 @@ import { AppDataSource } from '../config/db';
 import { In, type Repository } from 'typeorm';
 
 export interface PredictPayload {
+  userId: number;
   matchId: number;
   homeScore: number;
   awayScore: number;
@@ -108,8 +109,9 @@ class PredictService {
     }
   }
 
-  async createOrUpdatePredict(data: PredictPayload, userId: number): Promise<Predict> {
+  async createOrUpdatePredict(data: PredictPayload): Promise<Predict> {
     try {
+      const userId = data.userId;
       const existedPredict = await this.predictRepository.findOne({
         where: {
           matchId: data.matchId,
