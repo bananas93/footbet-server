@@ -2,12 +2,13 @@ import { In, type EntityManager, type Repository } from 'typeorm';
 import { Predict } from '../entity/Predict';
 import { AppDataSource } from '../config/db';
 import PointsCalculator from '../utils/calculate';
-import { Match, MatchStage, MatchStatus, type MatchGroupName } from '../entity/Match';
+import { Match, MatchGroupTour, type MatchStage, MatchStatus, type MatchGroupName } from '../entity/Match';
 
 export interface MatchPayload {
   stage: MatchStage;
   status?: MatchStatus;
   groupName?: MatchGroupName;
+  groupTour?: MatchGroupTour;
   homeScore?: number;
   awayScore?: number;
   matchDate: Date;
@@ -18,10 +19,8 @@ export interface MatchPayload {
 
 export interface MatchResponse {
   id: number;
-  stage: MatchStage;
-  tour: string;
-  date: string;
-  games: Match[];
+  groupName: MatchStage;
+  matches: Match[];
 }
 
 class MatchService {
@@ -61,10 +60,12 @@ class MatchService {
           homeTeam: {
             id: true,
             name: true,
+            logo: true,
           },
           awayTeam: {
             id: true,
             name: true,
+            logo: true,
           },
         },
       });
@@ -76,24 +77,26 @@ class MatchService {
         return matches;
       }
 
+      // Group matches by groupName
       const groupedMatches: Record<string, Match[]> = {};
-
       matches.forEach((match) => {
-        const key = match.stage === MatchStage.GROUP_STAGE ? `${match.stage}_${match.groupTour}` : match.stage;
-
-        if (!groupedMatches[key]) {
-          groupedMatches[key] = [];
+        const groupName = match.groupName || 'Other';
+        if (!groupedMatches[groupName]) {
+          groupedMatches[groupName] = [];
         }
-
-        groupedMatches[key].push(match);
+        groupedMatches[groupName].push(match);
       });
 
+      // Sort matches within each group by matchDate
+      for (const groupName in groupedMatches) {
+        groupedMatches[groupName].sort((a, b) => a.matchDate.getTime() - b.matchDate.getTime());
+      }
+
+      // Transform groupedMatches into MatchResponse format
       const groupArrays: MatchResponse[] = Object.keys(groupedMatches).map((key, index) => ({
         id: index + 1,
-        stage: groupedMatches[key][0].stage,
-        date: groupedMatches[key][0].matchDate.toISOString().split('T')[0],
-        tour: groupedMatches[key][0].groupTour || null,
-        games: groupedMatches[key],
+        groupName: key as MatchStage,
+        matches: groupedMatches[key],
       }));
 
       return groupArrays;
@@ -150,6 +153,11 @@ class MatchService {
       if (homeTeamId === awayTeamId) {
         throw new Error('Home team and away team cannot be the same');
       }
+      const matchTour = MatchGroupTour[data.groupTour as unknown as keyof typeof MatchGroupTour];
+      data = {
+        ...data,
+        groupTour: matchTour,
+      };
       const match = this.matchRepository.create(data);
       await this.matchRepository.save(match);
       return match;
@@ -163,6 +171,11 @@ class MatchService {
 
     try {
       await entityManager.transaction(async (transactionalEntityManager: EntityManager) => {
+        const matchTour = MatchGroupTour[data.groupTour as unknown as keyof typeof MatchGroupTour];
+        data = {
+          ...data,
+          groupTour: matchTour,
+        };
         // Update the match
         await transactionalEntityManager.update(Match, id, data);
 
