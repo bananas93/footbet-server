@@ -37,6 +37,8 @@ export enum MatchGroupTour {
   TWELFTH = '12 tour',
 }
 
+export type StageType = MatchStage | MatchGroupTour;
+
 export enum MatchResult {
   HOME_WIN = 'Home Win',
   AWAY_WIN = 'Away Win',

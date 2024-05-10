@@ -2,7 +2,7 @@ import { In, type EntityManager, type Repository } from 'typeorm';
 import { Predict } from '../entity/Predict';
 import { AppDataSource } from '../config/db';
 import PointsCalculator from '../utils/calculate';
-import { Match, MatchGroupTour, type MatchStage, MatchStatus, type MatchGroupName } from '../entity/Match';
+import { Match, MatchGroupTour, MatchStage, MatchStatus, type StageType, type MatchGroupName } from '../entity/Match';
 
 export interface MatchPayload {
   stage: MatchStage;
@@ -19,8 +19,12 @@ export interface MatchPayload {
 
 export interface MatchResponse {
   id: number;
-  groupName: MatchStage;
-  matches: Match[];
+  stage: string;
+  data: Array<{
+    id: number;
+    groupName?: string;
+    matches: Match[];
+  }>;
 }
 
 class MatchService {
@@ -77,27 +81,53 @@ class MatchService {
         return matches;
       }
 
-      // Group matches by groupName
-      const groupedMatches: Record<string, Match[]> = {};
+      // Group matches by stage and groupName (if stage is GROUP_STAGE)
+      const groupedMatches: Record<string, Record<string, Match[]>> = {};
       matches.forEach((match) => {
-        const groupName = match.groupName || 'Other';
-        if (!groupedMatches[groupName]) {
-          groupedMatches[groupName] = [];
+        let stage: StageType = match.stage;
+        if (stage === MatchStage.GROUP_STAGE) {
+          stage = match.groupTour;
         }
-        groupedMatches[groupName].push(match);
+        if (!groupedMatches[stage]) {
+          groupedMatches[stage] = {};
+        }
+        if ((stage as MatchStage) !== MatchStage.ROUND_OF_16) {
+          const groupName = match.groupName;
+          if (!groupedMatches[stage][groupName]) {
+            groupedMatches[stage][groupName] = [];
+          }
+          groupedMatches[stage][groupName].push(match);
+        } else {
+          // For stages other than GROUP_STAGE, create a default groupName
+          const defaultGroupName = 'Other';
+          if (!groupedMatches[stage][defaultGroupName]) {
+            groupedMatches[stage][defaultGroupName] = [];
+          }
+          groupedMatches[stage][defaultGroupName].push(match);
+        }
       });
 
-      // Sort matches within each group by matchDate
-      for (const groupName in groupedMatches) {
-        groupedMatches[groupName].sort((a, b) => a.matchDate.getTime() - b.matchDate.getTime());
-      }
-
       // Transform groupedMatches into MatchResponse format
-      const groupArrays: MatchResponse[] = Object.keys(groupedMatches).map((key, index) => ({
-        id: index + 1,
-        groupName: key as MatchStage,
-        matches: groupedMatches[key],
-      }));
+      const groupArrays: MatchResponse[] = [];
+      let id = 1;
+      for (const stage in groupedMatches) {
+        const stageObject: MatchResponse = {
+          id: id++,
+          stage: stage as MatchStage,
+          data: [],
+        };
+        for (const groupName in groupedMatches[stage]) {
+          const gameObject: any = {
+            id: id++,
+          };
+          if ((stage as MatchStage) !== MatchStage.ROUND_OF_16) {
+            gameObject.groupName = groupName;
+          }
+          gameObject.data = groupedMatches[stage][groupName];
+          stageObject.data.push(gameObject);
+        }
+        groupArrays.push(stageObject);
+      }
 
       return groupArrays;
     } catch (error: any) {
