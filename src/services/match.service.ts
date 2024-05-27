@@ -36,43 +36,40 @@ class MatchService {
     this.predictRepository = AppDataSource.getRepository(Predict);
   }
 
-  async getAllMatches(tournamentId?: number, flat?: boolean): Promise<MatchResponse[] | Match[]> {
+  async getAllMatches(userId: number, tournamentId?: number, flat?: boolean): Promise<MatchResponse[] | Match[]> {
     try {
       const where = tournamentId ? { tournamentId } : {};
-      const matches = await this.matchRepository.find({
-        where,
-        relations: {
-          homeTeam: true,
-          awayTeam: true,
-          tournament: true,
-          predicts: true,
-        },
-        select: {
-          id: true,
-          stage: true,
-          groupTour: true,
-          status: true,
-          result: true,
-          groupName: true,
-          homeScore: true,
-          awayScore: true,
-          matchDate: true,
-          tournament: {
-            id: true,
-            name: true,
-          },
-          homeTeam: {
-            id: true,
-            name: true,
-            logo: true,
-          },
-          awayTeam: {
-            id: true,
-            name: true,
-            logo: true,
-          },
-        },
-      });
+      const matches = await this.matchRepository
+        .createQueryBuilder('match')
+        .leftJoinAndSelect('match.homeTeam', 'homeTeam')
+        .leftJoinAndSelect('match.awayTeam', 'awayTeam')
+        .leftJoinAndSelect('match.tournament', 'tournament')
+        .leftJoinAndSelect('match.predicts', 'predicts', 'predicts.userId = :userId', { userId })
+        .where(where)
+        .select([
+          'match.id',
+          'match.stage',
+          'match.groupTour',
+          'match.status',
+          'match.result',
+          'match.groupName',
+          'match.homeScore',
+          'match.awayScore',
+          'match.matchDate',
+          'tournament.id',
+          'tournament.name',
+          'homeTeam.id',
+          'homeTeam.name',
+          'homeTeam.logo',
+          'awayTeam.id',
+          'awayTeam.name',
+          'awayTeam.logo',
+          'predicts.id',
+          'predicts.userId',
+          'predicts.homeScore',
+          'predicts.awayScore',
+        ])
+        .getMany();
       if (!matches) {
         return [];
       }
