@@ -29,6 +29,9 @@ export class Tournament {
   @Column({ nullable: true })
   knockoutRound: number;
 
+  @Column({ default: false })
+  thirdPlaceMatch: boolean;
+
   @Column({
     type: 'enum',
     enum: TournamentType,

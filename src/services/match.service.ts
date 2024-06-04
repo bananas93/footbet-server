@@ -69,6 +69,7 @@ class MatchService {
           'predicts.homeScore',
           'predicts.awayScore',
         ])
+        .orderBy('match.matchDate', 'ASC')
         .getMany();
       if (!matches) {
         return [];

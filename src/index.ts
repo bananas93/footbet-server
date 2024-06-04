@@ -62,6 +62,13 @@ app.use(
 );
 app.options('*', cors());
 
+app.use(express.static(path.join(__dirname, 'admin/build')));
+
+app.use((req, res, next) => {
+  console.log(`Received request: ${req.method} ${req.url}`);
+  next();
+});
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoute);
@@ -72,6 +79,14 @@ app.use('/api/leaderboard', leaderboardRoute);
 app.use('/api/predict', predictRoute);
 app.use('/api/room', roomRoute);
 app.use('/api/language', languageRoute);
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'admin/build', 'index.html'));
+});
+
+app.get('/*', (req, res) => {
+  console.log('ff');
+});
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);

@@ -1,6 +1,7 @@
 import { In, type Repository } from 'typeorm';
 import { AppDataSource } from '../config/db';
 import { Tournament, type TournamentType } from '../entity/Tournament';
+import League from '../utils/standings';
 
 class TournamentService {
   private readonly tournamentRepository: Repository<Tournament>;
@@ -33,9 +34,13 @@ class TournamentService {
     }
   }
 
-  async createTournament(data: Record<string, any>): Promise<Tournament> {
+  async createTournament(data: Record<string, any>, filename: string): Promise<Tournament> {
     try {
-      const tournament = this.tournamentRepository.create(data);
+      let newData = { ...data };
+      if (filename) {
+        newData = { ...data, logo: filename };
+      }
+      const tournament = this.tournamentRepository.create(newData);
       await this.tournamentRepository.save(tournament);
       return tournament;
     } catch (error: any) {
@@ -43,14 +48,35 @@ class TournamentService {
     }
   }
 
-  async updateTournament(id: number, data: Record<string, any>): Promise<Tournament> {
+  async updateTournament(id: number, data: Record<string, any>, filename: string): Promise<Tournament> {
     try {
-      await this.tournamentRepository.update(id, data);
+      let newData = { ...data };
+      if (filename) {
+        newData = { ...data, logo: filename };
+      }
+      await this.tournamentRepository.update(id, newData);
       const tournament = await this.tournamentRepository.findOne({ where: { id } });
       if (!tournament) {
         throw new Error('Tournament not found');
       }
       return tournament;
+    } catch (error: any) {
+      throw new Error(error.message || 'An error occurred in the service layer');
+    }
+  }
+
+  async getTournamentStandings(id: number): Promise<Record<string, any>> {
+    try {
+      const tournament = await this.tournamentRepository.findOne({
+        where: { id },
+        relations: ['matches', 'matches.homeTeam', 'matches.awayTeam'],
+      });
+      if (!tournament) {
+        throw new Error('Tournament not found');
+      }
+      const league = new League(tournament.matches);
+      const standings = league.getStandings();
+      return standings;
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
