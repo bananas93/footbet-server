@@ -20,11 +20,7 @@ export interface MatchPayload {
 export interface MatchResponse {
   id: number;
   stage: string;
-  data: Array<{
-    id: number;
-    groupName?: string;
-    matches: Match[];
-  }>;
+  data: Match[];
 }
 
 class MatchService {
@@ -44,7 +40,7 @@ class MatchService {
         .leftJoinAndSelect('match.homeTeam', 'homeTeam')
         .leftJoinAndSelect('match.awayTeam', 'awayTeam')
         .leftJoinAndSelect('match.tournament', 'tournament')
-        .leftJoinAndSelect('match.predicts', 'predicts', 'predicts.userId = :userId', { userId })
+        .leftJoinAndMapOne('match.predict', 'match.predicts', 'predicts', 'predicts.userId = :userId', { userId })
         .where(where)
         .select([
           'match.id',
@@ -68,9 +64,11 @@ class MatchService {
           'predicts.userId',
           'predicts.homeScore',
           'predicts.awayScore',
+          'predicts.points',
         ])
         .orderBy('match.matchDate', 'ASC')
         .getMany();
+
       if (!matches) {
         return [];
       }
@@ -79,51 +77,26 @@ class MatchService {
         return matches;
       }
 
-      // Group matches by stage and groupName (if stage is GROUP_STAGE)
-      const groupedMatches: Record<string, Record<string, Match[]>> = {};
+      const groupedMatches: Record<string, Match[]> = {};
       matches.forEach((match) => {
         let stage: StageType = match.stage;
         if (stage === MatchStage.GROUP_STAGE) {
           stage = match.groupTour;
         }
         if (!groupedMatches[stage]) {
-          groupedMatches[stage] = {};
+          groupedMatches[stage] = [];
         }
-        if ((stage as MatchStage) !== MatchStage.ROUND_OF_16) {
-          const groupName = match.groupName;
-          if (!groupedMatches[stage][groupName]) {
-            groupedMatches[stage][groupName] = [];
-          }
-          groupedMatches[stage][groupName].push(match);
-        } else {
-          // For stages other than GROUP_STAGE, create a default groupName
-          const defaultGroupName = 'Other';
-          if (!groupedMatches[stage][defaultGroupName]) {
-            groupedMatches[stage][defaultGroupName] = [];
-          }
-          groupedMatches[stage][defaultGroupName].push(match);
-        }
+        groupedMatches[stage].push(match);
       });
 
-      // Transform groupedMatches into MatchResponse format
       const groupArrays: MatchResponse[] = [];
       let id = 1;
       for (const stage in groupedMatches) {
         const stageObject: MatchResponse = {
           id: id++,
           stage: stage as MatchStage,
-          data: [],
+          data: groupedMatches[stage],
         };
-        for (const groupName in groupedMatches[stage]) {
-          const gameObject: any = {
-            id: id++,
-          };
-          if ((stage as MatchStage) !== MatchStage.ROUND_OF_16) {
-            gameObject.groupName = groupName;
-          }
-          gameObject.data = groupedMatches[stage][groupName];
-          stageObject.data.push(gameObject);
-        }
         groupArrays.push(stageObject);
       }
 

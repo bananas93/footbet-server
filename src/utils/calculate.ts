@@ -35,7 +35,7 @@ class PointsCalculator {
     const fivePlusGoalsPoints = this.calculateFivePlusGoalsPoints(match, prediction);
 
     // Sum up the points
-    const totalPoints = exactScorePoints + matchResultPoints + goalsDifferencePoints + fivePlusGoalsPoints;
+    const totalPoints = exactScorePoints || matchResultPoints + goalsDifferencePoints + fivePlusGoalsPoints;
 
     return { totalPoints, exactScorePoints, matchResultPoints, goalsDifferencePoints, fivePlusGoalsPoints };
   }
@@ -55,7 +55,7 @@ class PointsCalculator {
     const goalsDifferenceMatch = Math.abs(match.homeScore - match.awayScore);
     const goalsDifferencePrediction = Math.abs(prediction.homeScore - prediction.awayScore);
 
-    return goalsDifferenceMatch === goalsDifferencePrediction ? 3 : 0;
+    return goalsDifferenceMatch === goalsDifferencePrediction ? 1 : 0;
   }
 
   private calculateFivePlusGoalsPoints(match: Match, prediction: Predict): number {

@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Match } from './Match';
 import { User } from './User';
+import { Tournament } from './Tournament';
 
 @Entity()
 export class Predict {
@@ -17,6 +18,9 @@ export class Predict {
 
   @Column()
   matchId: number;
+
+  @Column()
+  tournamentId: number;
 
   @Column()
   userId: number;
@@ -48,6 +52,11 @@ export class Predict {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  // Many-to-One relationship with Match
+  @ManyToOne(() => Tournament, (tournament) => tournament.predicts)
+  @JoinColumn({ name: 'tournamentId' })
+  tournament: Tournament;
 
   // Many-to-One relationship with Match
   @ManyToOne(() => Match, (match) => match.predicts)

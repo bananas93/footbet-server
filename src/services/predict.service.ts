@@ -9,6 +9,16 @@ export interface PredictPayload {
   awayScore: number;
 }
 
+export interface IPredictTableResponse {
+  id: number;
+  name: string;
+  points: number;
+  correctScore: number;
+  correctDifference: number;
+  fivePlusGoals: number;
+  correctResult: number;
+}
+
 class PredictService {
   private readonly predictRepository: Repository<Predict>;
 
@@ -41,6 +51,31 @@ class PredictService {
           },
         },
       });
+      return predicts;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
+  async getPredictsTableByTournament(tournamentId: number): Promise<IPredictTableResponse[]> {
+    try {
+      const predicts = await this.predictRepository
+        .createQueryBuilder('predict')
+        .select('user.id', 'id')
+        .addSelect('user.name', 'name')
+        .addSelect('SUM(predict.points)', 'points')
+        .addSelect('SUM(CASE WHEN predict.correctScore <> 0 THEN 1 ELSE 0 END)', 'correctScore')
+        .addSelect('SUM(CASE WHEN predict.correctDifference <> 0 THEN 1 ELSE 0 END)', 'correctDifference')
+        .addSelect('SUM(CASE WHEN predict.fivePlusGoals <> 0 THEN 1 ELSE 0 END)', 'fivePlusGoals')
+        .addSelect('SUM(CASE WHEN predict.correctResult <> 0 THEN 1 ELSE 0 END)', 'correctResult')
+        .leftJoin('predict.user', 'user')
+        .leftJoin('predict.match', 'match')
+        .where('predict.tournamentId = :tournamentId', { tournamentId })
+        .andWhere('match.status IN (:...status)', { status: ['Live', 'Finished'] })
+        .groupBy('user.id')
+        .addGroupBy('user.name')
+        .getRawMany();
+
       return predicts;
     } catch (error: any) {
       throw new Error(error);
@@ -109,9 +144,8 @@ class PredictService {
     }
   }
 
-  async createOrUpdatePredict(data: PredictPayload): Promise<Predict> {
+  async createOrUpdatePredict(data: PredictPayload, userId: number): Promise<Predict> {
     try {
-      const userId = data.userId;
       const existedPredict = await this.predictRepository.findOne({
         where: {
           matchId: data.matchId,

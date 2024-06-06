@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Match } from './Match';
+import { Predict } from './Predict';
 
 export enum TournamentStatus {
   SCHEDULED = 'scheduled',
@@ -51,6 +52,9 @@ export class Tournament {
 
   @OneToMany(() => Match, (match) => match.tournament)
   matches: Match[];
+
+  @OneToMany(() => Predict, (predict) => predict.tournamentId)
+  predicts: Predict[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

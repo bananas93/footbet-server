@@ -1,5 +1,6 @@
 import { type Request, type Response } from 'express';
 import PredictService from '../services/predict.service';
+import { getUserIdFromToken } from '../utils/userUtils';
 
 class PredictController {
   async getAllPredicts(req: Request, res: Response): Promise<Response> {
@@ -21,6 +22,16 @@ class PredictController {
     }
   }
 
+  async getPredictsTableByTournament(req: Request, res: Response): Promise<Response> {
+    try {
+      const { tournamentId } = req.params;
+      const predicts = await PredictService.getPredictsTableByTournament(Number(tournamentId));
+      return res.status(200).json(predicts);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });
+    }
+  }
+
   async getPredictByUserId(req: Request, res: Response): Promise<Response> {
     try {
       const { userId } = req.params;
@@ -33,7 +44,8 @@ class PredictController {
 
   async createOrUpdatePredict(req: Request, res: Response): Promise<Response> {
     try {
-      const predict = await PredictService.createOrUpdatePredict(req.body);
+      const userId = getUserIdFromToken(req.headers);
+      const predict = await PredictService.createOrUpdatePredict(req.body, Number(userId));
       return res.status(201).json({ predict, message: 'Predict successfully saved' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });
