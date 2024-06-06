@@ -62,7 +62,11 @@ app.use(
 );
 app.options('*', cors());
 
-app.use(express.static(path.join(__dirname, 'admin/build')));
+const adminBuildPath = path.join(__dirname, 'admin/build');
+const clientBuildPath = path.join(__dirname, 'client/build');
+
+app.use(express.static(adminBuildPath));
+app.use(express.static(clientBuildPath));
 
 app.use((req, res, next) => {
   console.log(`Received request: ${req.method} ${req.url}`);
@@ -80,12 +84,14 @@ app.use('/api/predict', predictRoute);
 app.use('/api/room', roomRoute);
 app.use('/api/language', languageRoute);
 
-app.get('/admin', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'admin/build', 'index.html'));
+// Serve admin build
+app.get('/admin/*', (req, res) => {
+  res.sendFile(path.join(adminBuildPath, 'index.html'));
 });
 
+// Serve client build
 app.get('/*', (req, res) => {
-  console.log('ff');
+  res.sendFile(path.join(clientBuildPath, 'index.html'));
 });
 
 app.listen(port, () => {

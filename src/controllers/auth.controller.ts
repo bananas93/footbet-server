@@ -1,5 +1,4 @@
 import { type Request, type Response, type NextFunction } from 'express';
-import passport from 'passport';
 import AuthService from '../services/auth.service';
 import { getUserIdFromRefreshToken } from '../utils/userUtils';
 import { type User } from 'src/entity/User';
@@ -127,13 +126,13 @@ class AuthController {
   }
 
   async authGoogleUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-    passport.authenticate('google', async (user: User, err: any) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+    try {
+      const user = req.user as User;
       const { accessToken, refreshToken } = await AuthService.authGoogleUser(user);
-      res.redirect(`${process.env.CLIENT_URL}/login?accessToken=${accessToken}&refreshToken=${refreshToken}`);
-    })(req, res, next);
+      res.redirect(`${process.env.CLIENT_URL}/signin?accessToken=${accessToken}&refreshToken=${refreshToken}`);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   }
 
   async refreshAccessToken(req: Request, res: Response): Promise<Response> {
