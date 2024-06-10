@@ -13,4 +13,8 @@ router.put('/', checkAuth, upload.single('avatar'), async (req, res) => {
   await UserController.editUserProfile(req, res);
 });
 
+router.put('/password', checkAuth, async (req, res) => {
+  await UserController.changePassword(req, res);
+});
+
 export default router;

@@ -29,6 +29,19 @@ class UserController {
       return res.status(500).json({ error: err.message });
     }
   }
+
+  async changePassword(req: Request, res: Response): Promise<Response> {
+    try {
+      const userId = getUserIdFromToken(req.headers);
+      const user = await UserService.changePassword(Number(userId), req.body);
+      return res.status(200).json(user);
+    } catch (err: any) {
+      if (err.message === 'User not found') {
+        return res.status(404).json({ error: err.message });
+      }
+      return res.status(500).json({ error: err.message });
+    }
+  }
 }
 
 export default new UserController();
