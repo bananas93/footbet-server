@@ -28,6 +28,15 @@ export class User {
   name: string;
 
   @Column({ nullable: true })
+  nickname?: string;
+
+  @Column({ nullable: true })
+  avatar?: string;
+
+  @Column({ default: 'user' })
+  role: string;
+
+  @Column({ nullable: true })
   googleId?: string;
 
   @Column({ nullable: true })

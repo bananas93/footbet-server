@@ -119,6 +119,9 @@ export class Match {
   @Column()
   tournamentId: number;
 
+  @Column({ default: 1 })
+  tournamentLeague: number;
+
   @Column({ nullable: true })
   homeTeamId?: number;
 

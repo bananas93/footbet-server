@@ -21,6 +21,9 @@ export class Tournament {
   @Column({ unique: true })
   name: string;
 
+  @Column({ default: 1 })
+  leagues: number;
+
   @Column({ default: 0 })
   groupNumber: number;
 
@@ -32,6 +35,9 @@ export class Tournament {
 
   @Column({ default: false })
   thirdPlaceMatch: boolean;
+
+  @Column({ default: true })
+  hasTable: boolean;
 
   @Column({
     type: 'enum',

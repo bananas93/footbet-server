@@ -2,21 +2,7 @@ import { In, type EntityManager, type Repository } from 'typeorm';
 import { Predict } from '../entity/Predict';
 import { AppDataSource } from '../config/db';
 import PointsCalculator from '../utils/calculate';
-import { Match, MatchGroupTour, MatchStage, MatchStatus, type StageType, type MatchGroupName } from '../entity/Match';
-
-export interface MatchPayload {
-  stage: MatchStage;
-  status?: MatchStatus;
-  groupName?: MatchGroupName;
-  groupTour?: MatchGroupTour;
-  homeScore?: number;
-  awayScore?: number;
-  matchDate: Date;
-  tournamentId: number;
-  homeTeamId: number;
-  awayTeamId: number;
-}
-
+import { Match, MatchGroupTour, MatchStage, MatchStatus, type StageType } from '../entity/Match';
 export interface MatchResponse {
   id: number;
   stage: string;
@@ -52,6 +38,7 @@ class MatchService {
           'match.homeScore',
           'match.awayScore',
           'match.matchDate',
+          'match.tournamentLeague',
           'tournament.id',
           'tournament.name',
           'homeTeam.id',
@@ -77,8 +64,14 @@ class MatchService {
         return matches;
       }
 
+      const currentDate = new Date();
       const groupedMatches: Record<string, Match[]> = {};
+
       matches.forEach((match) => {
+        if (match.matchDate <= currentDate) {
+          match.status = MatchStatus.IN_PROGRESS;
+          void this.updateMatch(match.id, { status: MatchStatus.IN_PROGRESS });
+        }
         let stage: StageType = match.stage;
         if (stage === MatchStage.GROUP_STAGE) {
           stage = match.groupTour;
@@ -148,7 +141,7 @@ class MatchService {
     }
   }
 
-  async createMatch(data: MatchPayload): Promise<Match> {
+  async createMatch(data: Partial<Match>): Promise<Match> {
     try {
       const { homeTeamId, awayTeamId } = data;
       if (homeTeamId === awayTeamId) {
@@ -167,7 +160,7 @@ class MatchService {
     }
   }
 
-  async updateMatch(id: number, data: MatchPayload): Promise<Match> {
+  async updateMatch(id: number, data: Partial<Match>): Promise<Match> {
     const entityManager: EntityManager = this.matchRepository.manager;
 
     try {

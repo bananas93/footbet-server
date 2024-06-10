@@ -4,6 +4,7 @@ import localizationMiddleware from 'i18next-http-middleware';
 import 'dotenv/config';
 import cors from 'cors';
 import authRoute from './routes/auth.route';
+import userRoute from './routes/user.route';
 import languageRoute from './routes/language.route';
 import tournamentRoute from './routes/tournament.route';
 import teamRoute from './routes/team.route';
@@ -83,6 +84,7 @@ app.use('/api/leaderboard', leaderboardRoute);
 app.use('/api/predict', predictRoute);
 app.use('/api/room', roomRoute);
 app.use('/api/language', languageRoute);
+app.use('/api/user', userRoute);
 
 // Serve admin build
 app.get('/admin/*', (req, res) => {
