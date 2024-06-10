@@ -66,8 +66,8 @@ app.options('*', cors());
 const adminBuildPath = path.join(__dirname, 'admin/build');
 const clientBuildPath = path.join(__dirname, 'client/build');
 
-app.use(express.static(adminBuildPath));
 app.use(express.static(clientBuildPath));
+app.use(express.static(adminBuildPath));
 
 app.use((req, res, next) => {
   console.log(`Received request: ${req.method} ${req.url}`);
