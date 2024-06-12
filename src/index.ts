@@ -1,6 +1,6 @@
 import express, { type Express } from 'express';
-import i18next from 'i18next';
-import localizationMiddleware from 'i18next-http-middleware';
+// import i18next from 'i18next';
+// import localizationMiddleware from 'i18next-http-middleware';
 import 'dotenv/config';
 import cors from 'cors';
 import authRoute from './routes/auth.route';

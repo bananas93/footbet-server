@@ -8,7 +8,7 @@ class LanguageController {
       const { lang } = req.params;
       const userId = getUserIdFromToken(req.headers);
 
-      await req.i18n.changeLanguage(lang);
+      // await req.i18n.changeLanguage(lang);
       await LanguageService.setLanguage(lang, Number(userId));
 
       res.status(200).json({ success: true });
