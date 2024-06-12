@@ -16,8 +16,6 @@ dist/
 .idea/
 
 # Compiled TypeScript files
-*.js
-*.js.map
 
 # TypeScript declaration files
 *.d.ts
