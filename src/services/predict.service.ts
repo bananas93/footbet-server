@@ -74,6 +74,11 @@ class PredictService {
         .andWhere('match.status IN (:...status)', { status: ['Live', 'Finished'] })
         .groupBy('user.id')
         .addGroupBy('user.name')
+        .orderBy('points', 'DESC')
+        .addOrderBy('correctScore', 'DESC')
+        .addOrderBy('correctResult', 'DESC')
+        .addOrderBy('correctDifference', 'DESC')
+        .addOrderBy('fivePlusGoals', 'DESC')
         .getRawMany();
 
       return predicts;

@@ -68,7 +68,7 @@ class MatchService {
       const groupedMatches: Record<string, Match[]> = {};
 
       matches.forEach((match) => {
-        if (match.matchDate <= currentDate) {
+        if (match.matchDate < currentDate && match.status === MatchStatus.SCHEDULED) {
           match.status = MatchStatus.IN_PROGRESS;
           void this.updateMatch(match.id, { status: MatchStatus.IN_PROGRESS });
         }
@@ -185,7 +185,6 @@ class MatchService {
           const predictions = await this.predictRepository.find({ where: { matchId: id } });
 
           // Calculate points for each prediction and update the points in
-          console.log('prediction', predictions);
           for (const prediction of predictions) {
             const result = PointsCalculator.calculatePointsForPrediction(updatedMatch, prediction);
 
@@ -205,6 +204,11 @@ class MatchService {
                 correctResult: +matchResultPoints,
               });
             }
+          }
+        } else {
+          const predictions = await this.predictRepository.find({ where: { matchId: id } });
+          for (const prediction of predictions) {
+            await transactionalEntityManager.delete(Predict, prediction.id);
           }
         }
       });
