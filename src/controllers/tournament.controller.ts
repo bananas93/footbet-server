@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express';
 import TournamentService from '../services/tournament.service';
-import { type TournamentType } from 'src/entity/Tournament';
+import { type TournamentType } from '../entity/Tournament';
 
 class TournamentController {
   async getTournaments(req: Request, res: Response): Promise<Response> {

@@ -1,7 +1,7 @@
 import { type Request, type Response, type NextFunction } from 'express';
 import AuthService from '../services/auth.service';
 import { getUserIdFromRefreshToken } from '../utils/userUtils';
-import { type User } from 'src/entity/User';
+import { type User } from '../entity/User';
 
 class AuthController {
   async createUser(req: Request, res: Response): Promise<Response> {

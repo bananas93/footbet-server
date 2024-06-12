@@ -5,7 +5,7 @@ import 'dotenv/config';
 import cors from 'cors';
 import authRoute from './routes/auth.route';
 import userRoute from './routes/user.route';
-import languageRoute from './routes/language.route';
+// import languageRoute from './routes/language.route';
 import tournamentRoute from './routes/tournament.route';
 import teamRoute from './routes/team.route';
 import matchRoute from './routes/match.route';
@@ -15,30 +15,30 @@ import leaderboardRoute from './routes/leaderboard.route';
 import { AppDataSource } from './config/db';
 import path from 'path';
 
-i18next
-  .use(localizationMiddleware.LanguageDetector)
-  .init({
-    fallbackLng: ['en', 'uk'],
-    preload: ['en', 'uk'],
-    resources: {
-      en: require('./locales/en.json'),
-      uk: require('./locales/uk.json'),
-    },
-  })
-  .then(() => {
-    console.log('i18next initialized');
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+// i18next
+//   .use(localizationMiddleware.LanguageDetector)
+//   .init({
+//     fallbackLng: ['en', 'uk'],
+//     preload: ['en', 'uk'],
+//     resources: {
+//       en: require('./locales/en.json'),
+//       uk: require('./locales/uk.json'),
+//     },
+//   })
+//   .then(() => {
+//     console.log('i18next initialized');
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
 
 const app: Express = express();
 
-app.use(
-  localizationMiddleware.handle(i18next, {
-    removeLngFromUrl: false,
-  }),
-);
+// app.use(
+//   localizationMiddleware.handle(i18next, {
+//     removeLngFromUrl: false,
+//   }),
+// );
 
 const port = process.env.PORT ?? '3000';
 
@@ -83,7 +83,7 @@ app.use('/api/match', matchRoute);
 app.use('/api/leaderboard', leaderboardRoute);
 app.use('/api/predict', predictRoute);
 app.use('/api/room', roomRoute);
-app.use('/api/language', languageRoute);
+// app.use('/api/language', languageRoute);
 app.use('/api/user', userRoute);
 
 // Serve admin build
