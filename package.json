@@ -6,10 +6,11 @@
   "scripts": {
     "build": "npx tsc && npm run copy-files",
     "copy-files": "copyfiles -u 1 \"src/admin/**/*\" \"src/client/**/*\" dist/ --verbose",
-    "start": "node dist/index.js",
-    "dev": "NODE_ENV=development env-cmd -f .env.develop nodemon src/index.ts"
+    "start": "env-cmd -f .env node dist/index.js",
+    "dev": "NODE_ENV=development env-cmd -f .env.develop nodemon src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "David Amerov",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -48,6 +49,7 @@
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
     "nodemon": "^3.0.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
 }
