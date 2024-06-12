@@ -12,7 +12,7 @@ import matchRoute from './routes/match.route';
 import predictRoute from './routes/predict.route';
 import roomRoute from './routes/room.route';
 import leaderboardRoute from './routes/leaderboard.route';
-import { AppDataSource } from './config/db';
+import AppDataSource from './config/db';
 import path from 'path';
 
 // i18next

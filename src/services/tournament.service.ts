@@ -1,5 +1,5 @@
 import { In, type Repository } from 'typeorm';
-import { AppDataSource } from '../config/db';
+import AppDataSource from '../config/db';
 import { Tournament, type TournamentType } from '../entity/Tournament';
 import League from '../utils/standings';
 

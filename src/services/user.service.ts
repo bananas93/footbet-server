@@ -1,6 +1,6 @@
 import { type Repository } from 'typeorm';
 import bcrypt from 'bcryptjs';
-import { AppDataSource } from '../config/db';
+import AppDataSource from '../config/db';
 import { User } from '../entity/User';
 import { checkPassword, createPasswordHash } from '../utils/userUtils';
 

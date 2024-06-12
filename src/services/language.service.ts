@@ -1,5 +1,5 @@
 import { type Repository } from 'typeorm';
-import { AppDataSource } from '../config/db';
+import AppDataSource from '../config/db';
 import { User } from '../entity/User';
 
 class LanguageService {

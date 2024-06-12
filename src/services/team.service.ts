@@ -1,4 +1,4 @@
-import { AppDataSource } from '../config/db';
+import AppDataSource from '../config/db';
 import { Team, TeamType } from '../entity/Team';
 import { In, type Repository } from 'typeorm';
 

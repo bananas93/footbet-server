@@ -1,6 +1,6 @@
 import { In, type EntityManager, type Repository } from 'typeorm';
 import { Predict } from '../entity/Predict';
-import { AppDataSource } from '../config/db';
+import AppDataSource from '../config/db';
 import PointsCalculator from '../utils/calculate';
 import { Match, MatchGroupTour, MatchStage, MatchStatus, type StageType } from '../entity/Match';
 export interface MatchResponse {

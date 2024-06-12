@@ -1,5 +1,5 @@
 import { Predict } from '../entity/Predict';
-import { AppDataSource } from '../config/db';
+import AppDataSource from '../config/db';
 import { In, type Repository } from 'typeorm';
 
 export interface PredictPayload {

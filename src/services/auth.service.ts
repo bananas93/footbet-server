@@ -2,7 +2,7 @@
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
-import { AppDataSource } from '../config/db';
+import AppDataSource from '../config/db';
 import { User } from '../entity/User';
 import {
   checkEmail,

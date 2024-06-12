@@ -1,5 +1,5 @@
 import { type Repository } from 'typeorm';
-import { AppDataSource } from '../config/db';
+import AppDataSource from '../config/db';
 import { Room, RoomType } from '../entity/Room';
 import { User } from '../entity/User';
 import { generateRoomPasswordToken, verifyPasswordToken } from '../utils/roomUtils';

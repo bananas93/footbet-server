@@ -1,5 +1,5 @@
 import { type Repository } from 'typeorm';
-import { AppDataSource } from '../config/db';
+import AppDataSource from '../config/db';
 import { Predict } from '../entity/Predict';
 import { User } from '../entity/User';
 import PointsCalculator from '../utils/calculate';
