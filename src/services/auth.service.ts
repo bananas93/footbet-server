@@ -60,6 +60,9 @@ class AuthService {
       if (!user) {
         throw new Error('User not found');
       }
+      if (!user.password) {
+        throw new Error('Invalid password');
+      }
       const validPassword = bcrypt.compareSync(data.password, user.password);
       if (!validPassword) {
         throw new Error('Invalid password');
