@@ -3,7 +3,8 @@ import multer from 'multer';
 // Set up storage for uploaded files
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'src/uploads/');
+    const uploadFolder = process.env.NODE_ENV === 'production' ? 'dist/uploads/' : 'src/uploads/';
+    cb(null, uploadFolder);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname);
