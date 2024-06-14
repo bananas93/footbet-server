@@ -3,7 +3,7 @@ import { io } from '../socket';
 import { Predict } from '../entity/Predict';
 import AppDataSource from '../config/db';
 import PointsCalculator from '../utils/calculate';
-import { Match, MatchGroupTour, MatchStage, MatchStatus, type StageType } from '../entity/Match';
+import { Match, MatchGroupTour, MatchStage, type MatchStatus, type StageType } from '../entity/Match';
 export interface MatchResponse {
   id: number;
   stage: string;
@@ -202,12 +202,14 @@ class MatchService {
         }
 
         // Calculate points and update predictions if the match is in progress or finished
-        if ([MatchStatus.IN_PROGRESS, MatchStatus.FINISHED].includes(updatedMatch.status)) {
+        if (updatedMatch.status !== 'Scheduled') {
           const predictions = await this.predictRepository.find({ where: { matchId: id } });
 
           // Calculate points for each prediction and update the points in
           for (const prediction of predictions) {
             const result = PointsCalculator.calculatePointsForPrediction(updatedMatch, prediction);
+
+            console.log('result:', result);
 
             if (typeof result === 'number') {
               // Handle the case where result is 0 (or any other numeric value) if needed

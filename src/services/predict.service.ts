@@ -144,10 +144,11 @@ class PredictService {
 
   async createOrUpdatePredict(data: PredictPayload, userId: number): Promise<Predict> {
     try {
+      const id = data.userId || userId;
       const existedPredict = await this.predictRepository.findOne({
         where: {
           matchId: data.matchId,
-          userId,
+          userId: id,
         },
       });
 

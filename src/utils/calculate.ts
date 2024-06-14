@@ -1,4 +1,4 @@
-import { MatchStatus, type Match, MatchResult } from '../entity/Match';
+import { type Match, MatchResult } from '../entity/Match';
 import { type Predict } from '../entity/Predict';
 
 interface CalculateResult {
@@ -19,7 +19,7 @@ class PointsCalculator {
   }
 
   calculatePointsForPrediction(match: Match, prediction: Predict): CalculateResult {
-    if (![MatchStatus.IN_PROGRESS, MatchStatus.FINISHED].includes(match.status)) {
+    if (match.status === 'Scheduled') {
       return {
         totalPoints: 0,
         exactScorePoints: 0,
