@@ -1,14 +1,20 @@
 import { type Request, type Response } from 'express';
 import MatchService from '../services/match.service';
 import { getUserIdFromToken } from '../utils/userUtils';
+import { type MatchStatus } from '../entity/Match';
 
 class MatchController {
   async getAllMatches(req: Request, res: Response): Promise<Response> {
     try {
       const userId = getUserIdFromToken(req.headers);
       const { tournamentId } = req.params;
-      const { flat } = req.query;
-      const matches = await MatchService.getAllMatches(Number(userId), Number(tournamentId), !!flat);
+      const { flat, status } = req.query;
+      const matches = await MatchService.getAllMatches(
+        Number(userId),
+        Number(tournamentId),
+        status as MatchStatus,
+        !!flat,
+      );
       return res.status(200).json(matches);
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'An error occurred in the controller layer' });

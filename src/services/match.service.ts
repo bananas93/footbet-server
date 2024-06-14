@@ -19,9 +19,16 @@ class MatchService {
     this.predictRepository = AppDataSource.getRepository(Predict);
   }
 
-  async getAllMatches(userId: number, tournamentId?: number, flat?: boolean): Promise<MatchResponse[] | Match[]> {
+  async getAllMatches(
+    userId: number,
+    tournamentId?: number,
+    status?: MatchStatus,
+    flat?: boolean,
+  ): Promise<MatchResponse[] | Match[]> {
+    const where = tournamentId ? { tournamentId } : {};
+    const whereStatus = status ? { status } : {};
+
     try {
-      const where = tournamentId ? { tournamentId } : {};
       const matches = await this.matchRepository
         .createQueryBuilder('match')
         .leftJoinAndSelect('match.homeTeam', 'homeTeam')
@@ -29,6 +36,7 @@ class MatchService {
         .leftJoinAndSelect('match.tournament', 'tournament')
         .leftJoinAndMapOne('match.predict', 'match.predicts', 'predicts', 'predicts.userId = :userId', { userId })
         .where(where)
+        .andWhere(whereStatus)
         .select([
           'match.id',
           'match.stage',

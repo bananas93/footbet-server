@@ -49,8 +49,5 @@ export const checkEmail = (email: string): boolean => {
 
 export const checkPassword = (password: string): boolean => {
   const isLongEnough = password.length >= 8;
-  const hasNumber = /\d/.test(password);
-  const hasCapitalLetter = /[A-Z]/.test(password);
-  const hasLowerCaseLetter = /[a-z]/.test(password);
-  return isLongEnough && hasNumber && hasCapitalLetter && hasLowerCaseLetter;
+  return isLongEnough;
 };
