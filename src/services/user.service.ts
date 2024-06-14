@@ -27,6 +27,7 @@ class UserService {
           name: true,
           nickname: true,
           avatar: true,
+          role: true,
         },
       });
       if (!user) {
