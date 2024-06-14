@@ -73,14 +73,9 @@ class MatchService {
         return matches;
       }
 
-      const currentDate = new Date();
       const groupedMatches: Record<string, Match[]> = {};
 
       matches.forEach((match) => {
-        if (match.matchDate < currentDate && match.status === MatchStatus.SCHEDULED) {
-          match.status = MatchStatus.IN_PROGRESS;
-          void this.updateMatch(match.id, { status: MatchStatus.IN_PROGRESS });
-        }
         let stage: StageType = match.stage;
         if (stage === MatchStage.GROUP_STAGE) {
           stage = match.groupTour;
@@ -230,11 +225,6 @@ class MatchService {
                 correctResult: +matchResultPoints,
               });
             }
-          }
-        } else {
-          const predictions = await this.predictRepository.find({ where: { matchId: id } });
-          for (const prediction of predictions) {
-            await transactionalEntityManager.delete(Predict, prediction.id);
           }
         }
 
