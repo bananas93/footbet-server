@@ -92,20 +92,13 @@ class PredictService {
       const predicts = await this.predictRepository.find({
         where: { matchId },
         relations: {
-          match: true,
           user: true,
         },
         select: {
-          match: {
-            id: true,
-            stage: true,
-            groupTour: true,
-            status: true,
-            groupName: true,
-            homeScore: true,
-            awayScore: true,
-            matchDate: true,
-          },
+          id: true,
+          homeScore: true,
+          awayScore: true,
+          points: true,
           user: {
             id: true,
             name: true,

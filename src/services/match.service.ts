@@ -1,4 +1,5 @@
 import { In, type EntityManager, type Repository } from 'typeorm';
+import { io } from '../socket';
 import { Predict } from '../entity/Predict';
 import AppDataSource from '../config/db';
 import PointsCalculator from '../utils/calculate';
@@ -174,7 +175,24 @@ class MatchService {
         await transactionalEntityManager.update(Match, id, data);
 
         // Fetch the updated match
-        const updatedMatch = await transactionalEntityManager.findOne(Match, { where: { id } });
+        const updatedMatch = await transactionalEntityManager.findOne(Match, {
+          where: { id },
+          relations: {
+            homeTeam: true,
+            awayTeam: true,
+          },
+          select: {
+            id: true,
+            homeScore: true,
+            awayScore: true,
+            homeTeam: {
+              name: true,
+            },
+            awayTeam: {
+              name: true,
+            },
+          },
+        });
 
         if (!updatedMatch) {
           throw new Error('Match not found');
@@ -211,6 +229,8 @@ class MatchService {
             await transactionalEntityManager.delete(Predict, prediction.id);
           }
         }
+
+        io.emit('matchUpdated', updatedMatch);
       });
 
       // Fetch the final updated match
