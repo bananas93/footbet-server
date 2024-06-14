@@ -13,7 +13,7 @@ const AppDataSource = new DataSource({
   migrations: [path.join(__dirname, '/../migrations/*.{js,ts}')],
   entities: [path.join(__dirname, '/../entity/*.{js,ts}')],
   extra: {
-    connectionLimit: 10, // Set the maximum number of connections in the pool
+    connectionLimit: 20, // Set the maximum number of connections in the pool
   },
 });
 
