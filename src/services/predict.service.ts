@@ -153,12 +153,12 @@ class PredictService {
       });
 
       if (existedPredict) {
-        await this.predictRepository.update(existedPredict.id, { ...data, userId });
+        await this.predictRepository.update(existedPredict.id, { ...data, userId: id });
         const predict = await this.predictRepository.findOne({ where: { id: existedPredict.id } });
         return predict;
       }
 
-      const predict = await this.predictRepository.save({ ...data, userId });
+      const predict = await this.predictRepository.save({ ...data, userId: id });
       return predict;
     } catch (error: any) {
       if (error.name === 'QueryFailedError' && error.code === 'ER_NO_REFERENCED_ROW_2') {
