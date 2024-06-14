@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "npx tsc && npm run copy-files",
-    "copy-files": "copyfiles -u 1 \"src/uploads/**/*\" \"src/admin/**/*\" \"src/client/**/*\" dist/ --verbose",
+    "copy-files": "copyfiles -u 1 \"src/admin/**/*\" \"src/client/**/*\" dist/ --verbose",
     "start": "node dist/index.js",
     "dev": "NODE_ENV=development env-cmd -f .env.develop nodemon src/index.ts",
     "migrate": "NODE_ENV=development env-cmd -f .env.develop nodemon src/migration.ts"
