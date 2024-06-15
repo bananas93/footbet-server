@@ -13,6 +13,7 @@ type ITable = Record<
     goalsScored: number;
     goalsAgainst: number;
     points: number;
+    form: string[];
   }>
 >;
 
@@ -59,6 +60,7 @@ class League {
         goalsScored: 0,
         goalsAgainst: 0,
         points: 0,
+        form: [],
       });
     }
   }
@@ -75,34 +77,52 @@ class League {
 
   setResults(group: string | number, match: Match): void {
     const { homeScore, awayScore, status } = match;
-
     const homeTeam = match.homeTeam.name;
     const awayTeam = match.awayTeam.name;
 
+    let homeResult = '';
+    let awayResult = '';
+
+    if (status !== 'Scheduled') {
+      if (homeScore > awayScore) {
+        homeResult = 'won';
+        awayResult = 'lost';
+        this.updateTeamStats(group, homeTeam, 'won', 3);
+        this.updateTeamStats(group, awayTeam, 'lost', 0);
+      } else if (homeScore < awayScore) {
+        homeResult = 'lost';
+        awayResult = 'won';
+        this.updateTeamStats(group, homeTeam, 'lost', 0);
+        this.updateTeamStats(group, awayTeam, 'won', 3);
+      } else {
+        homeResult = 'drawn';
+        awayResult = 'drawn';
+        this.updateTeamStats(group, homeTeam, 'drawn', 1);
+        this.updateTeamStats(group, awayTeam, 'drawn', 1);
+      }
+
+      this.setTeamForm(group, homeTeam, homeResult);
+      this.setTeamForm(group, awayTeam, awayResult);
+    } else {
+      this.setTeamForm(group, homeTeam, '');
+      this.setTeamForm(group, awayTeam, '');
+    }
+  }
+
+  updateTeamStats(group: string | number, team: string, resultType: string, points: number): void {
     this.table[group].forEach((item) => {
-      if (status !== 'Scheduled') {
-        if (item.team === homeTeam) {
-          if (homeScore > awayScore) {
-            item.won++;
-            item.points += 3;
-          } else if (homeScore < awayScore) {
-            item.lost++;
-          } else {
-            item.drawn++;
-            item.points += 1;
-          }
-        }
-        if (item.team === awayTeam) {
-          if (homeScore > awayScore) {
-            item.lost++;
-          } else if (homeScore < awayScore) {
-            item.won++;
-            item.points += 3;
-          } else {
-            item.drawn++;
-            item.points += 1;
-          }
-        }
+      if (item.team === team) {
+        item[resultType]++;
+        item.points += points;
+      }
+    });
+  }
+
+  setTeamForm(group: string | number, team: string, result: string): void {
+    this.table[group].forEach((item) => {
+      if (item.team === team) {
+        item.form.unshift(result);
+        if (item.form.length > 5) item.form.shift();
       }
     });
   }

@@ -80,7 +80,6 @@ class PredictService {
         .addOrderBy('correctDifference', 'DESC')
         .addOrderBy('fivePlusGoals', 'DESC')
         .getRawMany();
-
       return predicts;
     } catch (error: any) {
       throw new Error(error);
