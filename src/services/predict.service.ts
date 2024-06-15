@@ -52,7 +52,7 @@ class PredictService {
         },
         order: {
           match: {
-            matchDate: 'DESC',
+            matchDate: 'ASC',
           },
         },
       });
