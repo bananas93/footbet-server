@@ -50,6 +50,11 @@ class PredictService {
             name: true,
           },
         },
+        order: {
+          match: {
+            matchDate: 'DESC',
+          },
+        },
       });
       return predicts;
     } catch (error: any) {
@@ -102,6 +107,9 @@ class PredictService {
             id: true,
             name: true,
           },
+        },
+        order: {
+          points: 'DESC',
         },
       });
       return predicts;
