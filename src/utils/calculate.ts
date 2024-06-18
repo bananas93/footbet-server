@@ -55,7 +55,15 @@ class PointsCalculator {
     const goalsDifferenceMatch = Math.abs(match.homeScore - match.awayScore);
     const goalsDifferencePrediction = Math.abs(prediction.homeScore - prediction.awayScore);
 
-    return goalsDifferenceMatch === goalsDifferencePrediction ? 1 : 0;
+    if (match.homeScore > match.awayScore && prediction.homeScore > prediction.awayScore) {
+      return goalsDifferenceMatch === goalsDifferencePrediction ? 1 : 0;
+    } else if (match.homeScore < match.awayScore && prediction.homeScore < prediction.awayScore) {
+      return goalsDifferenceMatch === goalsDifferencePrediction ? 1 : 0;
+    } else if (match.homeScore === match.awayScore && prediction.homeScore === prediction.awayScore) {
+      return goalsDifferenceMatch === goalsDifferencePrediction ? 1 : 0;
+    } else {
+      return 0;
+    }
   }
 
   private calculateFivePlusGoalsPoints(match: Match, prediction: Predict): number {
