@@ -76,7 +76,8 @@ class TournamentService {
       }
       const league = new League(tournament.matches);
       const standings = league.getStandings();
-      return standings;
+      const thirdPlacesStandings = league.getThirdPlaceTeams();
+      return { standings, thirdPlacesStandings };
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }

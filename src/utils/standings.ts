@@ -17,6 +17,20 @@ type ITable = Record<
   }>
 >;
 
+interface TeamStats {
+  id: string;
+  team: string;
+  logo: string;
+  played: number;
+  won: number;
+  lost: number;
+  drawn: number;
+  goalsScored: number;
+  goalsAgainst: number;
+  points: number;
+  form: string[];
+}
+
 class League {
   matches: Match[];
   table: ITable;
@@ -33,8 +47,15 @@ class League {
 
       if (!match.groupName) return;
 
-      if (!this.table[homeTeam]) this.addToTable(match.groupName, homeTeam, match.homeTeam.logo);
-      if (!this.table[awayTeam]) this.addToTable(match.groupName, awayTeam, match.awayTeam.logo);
+      if (!this.table[match.groupName]) this.table[match.groupName] = [];
+
+      if (!this.table[match.groupName].some((item) => item.team === homeTeam)) {
+        this.addToTable(match.groupName, homeTeam, match.homeTeam.logo);
+      }
+
+      if (!this.table[match.groupName].some((item) => item.team === awayTeam)) {
+        this.addToTable(match.groupName, awayTeam, match.awayTeam.logo);
+      }
 
       this.increasePlayed(match.groupName, [homeTeam, awayTeam], match.status);
       this.setResults(match.groupName, match);
@@ -47,22 +68,19 @@ class League {
   }
 
   addToTable(group: string, team: string, logo: string): void {
-    if (!this.table[group]) this.table[group] = [];
-    if (!this.table[group].some((item) => item.team === team)) {
-      this.table[group].push({
-        id: Math.random().toString(36).substr(2, 9),
-        team,
-        logo,
-        played: 0,
-        won: 0,
-        lost: 0,
-        drawn: 0,
-        goalsScored: 0,
-        goalsAgainst: 0,
-        points: 0,
-        form: [],
-      });
-    }
+    this.table[group].push({
+      id: Math.random().toString(36).substr(2, 9),
+      team,
+      logo,
+      played: 0,
+      won: 0,
+      lost: 0,
+      drawn: 0,
+      goalsScored: 0,
+      goalsAgainst: 0,
+      points: 0,
+      form: [],
+    });
   }
 
   increasePlayed(group: string | number, teams: any[], status: string): void {
@@ -139,14 +157,131 @@ class League {
   }
 
   sortTable(): void {
-    Object.entries(this.table).map((group) =>
-      group[1].sort(
-        (a, b) =>
-          b.points - a.points ||
-          b.goalsScored - b.goalsAgainst - (a.goalsScored - a.goalsAgainst) ||
-          b.goalsScored - a.goalsScored,
-      ),
+    Object.entries(this.table).forEach(([group, teams]) =>
+      teams.sort((a, b) => {
+        if (a.points !== b.points) return b.points - a.points;
+
+        // Head-to-head comparison
+        const headToHeadMatches = this.matches.filter(
+          (match) =>
+            (match.homeTeam.name === a.team && match.awayTeam.name === b.team) ||
+            (match.homeTeam.name === b.team && match.awayTeam.name === a.team),
+        );
+
+        if (headToHeadMatches.length > 0) {
+          let aPoints = 0;
+          let bPoints = 0;
+          let aGoalDiff = 0;
+          let bGoalDiff = 0;
+          let aGoals = 0;
+          let bGoals = 0;
+
+          headToHeadMatches.forEach((match) => {
+            if (match.homeTeam.name === a.team) {
+              aGoals += match.homeScore;
+              bGoals += match.awayScore;
+              aGoalDiff += match.homeScore - match.awayScore;
+              bGoalDiff += match.awayScore - match.homeScore;
+              if (match.homeScore > match.awayScore) aPoints += 3;
+              else if (match.homeScore < match.awayScore) bPoints += 3;
+              else {
+                aPoints += 1;
+                bPoints += 1;
+              }
+            } else {
+              bGoals += match.homeScore;
+              aGoals += match.awayScore;
+              bGoalDiff += match.homeScore - match.awayScore;
+              aGoalDiff += match.awayScore - match.homeScore;
+              if (match.homeScore > match.awayScore) bPoints += 3;
+              else if (match.homeScore < match.awayScore) aPoints += 3;
+              else {
+                bPoints += 1;
+                aPoints += 1;
+              }
+            }
+          });
+
+          if (aPoints !== bPoints) return bPoints - aPoints;
+          if (aGoalDiff !== bGoalDiff) return bGoalDiff - aGoalDiff;
+          if (aGoals !== bGoals) return bGoals - aGoals;
+        }
+
+        // Overall goal difference and goals scored
+        const goalDifferenceA = a.goalsScored - a.goalsAgainst;
+        const goalDifferenceB = b.goalsScored - b.goalsAgainst;
+        if (goalDifferenceA !== goalDifferenceB) return goalDifferenceB - goalDifferenceA;
+        return b.goalsScored - a.goalsScored;
+      }),
     );
+  }
+
+  getThirdPlaceTeams(): TeamStats[] {
+    const thirdPlaceTeams: TeamStats[] = [];
+
+    Object.entries(this.table).forEach(([group, teams]) => {
+      if (teams.length >= 3) {
+        thirdPlaceTeams.push(teams[2]); // Teams are already sorted, so the third team is at index 2
+      }
+    });
+
+    thirdPlaceTeams.sort((a, b) => {
+      if (a.points !== b.points) return b.points - a.points;
+
+      // Head-to-head comparison
+      const headToHeadMatches = this.matches.filter(
+        (match) =>
+          (match.homeTeam.name === a.team && match.awayTeam.name === b.team) ||
+          (match.homeTeam.name === b.team && match.awayTeam.name === a.team),
+      );
+
+      if (headToHeadMatches.length > 0) {
+        let aPoints = 0;
+        let bPoints = 0;
+        let aGoalDiff = 0;
+        let bGoalDiff = 0;
+        let aGoals = 0;
+        let bGoals = 0;
+
+        headToHeadMatches.forEach((match) => {
+          if (match.homeTeam.name === a.team) {
+            aGoals += match.homeScore;
+            bGoals += match.awayScore;
+            aGoalDiff += match.homeScore - match.awayScore;
+            bGoalDiff += match.awayScore - match.homeScore;
+            if (match.homeScore > match.awayScore) aPoints += 3;
+            else if (match.homeScore < match.awayScore) bPoints += 3;
+            else {
+              aPoints += 1;
+              bPoints += 1;
+            }
+          } else {
+            bGoals += match.homeScore;
+            aGoals += match.awayScore;
+            bGoalDiff += match.homeScore - match.awayScore;
+            aGoalDiff += match.awayScore - match.homeScore;
+            if (match.homeScore > match.awayScore) bPoints += 3;
+            else if (match.homeScore < match.awayScore) aPoints += 3;
+            else {
+              bPoints += 1;
+              aPoints += 1;
+            }
+          }
+        });
+
+        if (aPoints !== bPoints) return bPoints - aPoints;
+        if (aGoalDiff !== bGoalDiff) return bGoalDiff - aGoalDiff;
+        if (aGoals !== bGoals) return bGoals - aGoals;
+      }
+
+      // Overall goal difference and goals scored
+      const goalDifferenceA = a.goalsScored - a.goalsAgainst;
+      const goalDifferenceB = b.goalsScored - b.goalsAgainst;
+      if (goalDifferenceA !== goalDifferenceB) return goalDifferenceB - goalDifferenceA;
+      return b.goalsScored - a.goalsScored;
+    });
+
+    return thirdPlaceTeams;
   }
 }
 

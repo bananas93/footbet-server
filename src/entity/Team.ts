@@ -24,6 +24,9 @@ export class Team {
   @Column({ nullable: true })
   logo?: string;
 
+  @Column({ nullable: true })
+  rank?: number;
+
   @OneToMany(() => Match, (match) => match.homeTeam)
   homeMatches: Match[];
 

@@ -4,10 +4,13 @@ import { Predict } from '../entity/Predict';
 import AppDataSource from '../config/db';
 import PointsCalculator from '../utils/calculate';
 import { Match, MatchGroupTour, MatchStage, type MatchStatus, type StageType } from '../entity/Match';
+
 export interface MatchResponse {
   id: number;
   stage: string;
   data: Match[];
+  startDate: Date;
+  endDate: Date;
 }
 
 class MatchService {
@@ -92,6 +95,8 @@ class MatchService {
         const stageObject: MatchResponse = {
           id: id++,
           stage: stage as MatchStage,
+          startDate: groupedMatches[stage][0].matchDate,
+          endDate: groupedMatches[stage][groupedMatches[stage].length - 1].matchDate,
           data: groupedMatches[stage],
         };
         groupArrays.push(stageObject);
