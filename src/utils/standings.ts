@@ -14,6 +14,7 @@ type ITable = Record<
     goalsAgainst: number;
     points: number;
     form: string[];
+    rank: number;
   }>
 >;
 
@@ -29,6 +30,7 @@ interface TeamStats {
   goalsAgainst: number;
   points: number;
   form: string[];
+  rank: number;
 }
 
 class League {
@@ -50,11 +52,11 @@ class League {
       if (!this.table[match.groupName]) this.table[match.groupName] = [];
 
       if (!this.table[match.groupName].some((item) => item.team === homeTeam)) {
-        this.addToTable(match.groupName, homeTeam, match.homeTeam.logo);
+        this.addToTable(match.groupName, homeTeam, match.homeTeam.logo, match.homeTeam.rank);
       }
 
       if (!this.table[match.groupName].some((item) => item.team === awayTeam)) {
-        this.addToTable(match.groupName, awayTeam, match.awayTeam.logo);
+        this.addToTable(match.groupName, awayTeam, match.awayTeam.logo, match.awayTeam.rank);
       }
 
       this.increasePlayed(match.groupName, [homeTeam, awayTeam], match.status);
@@ -67,7 +69,7 @@ class League {
     return this.table;
   }
 
-  addToTable(group: string, team: string, logo: string): void {
+  addToTable(group: string, team: string, logo: string, rank: number): void {
     this.table[group].push({
       id: Math.random().toString(36).substr(2, 9),
       team,
@@ -80,6 +82,7 @@ class League {
       goalsAgainst: 0,
       points: 0,
       form: [],
+      rank,
     });
   }
 
@@ -205,6 +208,7 @@ class League {
           if (aPoints !== bPoints) return bPoints - aPoints;
           if (aGoalDiff !== bGoalDiff) return bGoalDiff - aGoalDiff;
           if (aGoals !== bGoals) return bGoals - aGoals;
+          return a.rank - b.rank;
         }
 
         // Overall goal difference and goals scored
@@ -278,7 +282,8 @@ class League {
       const goalDifferenceA = a.goalsScored - a.goalsAgainst;
       const goalDifferenceB = b.goalsScored - b.goalsAgainst;
       if (goalDifferenceA !== goalDifferenceB) return goalDifferenceB - goalDifferenceA;
-      return b.goalsScored - a.goalsScored;
+      if (a.goalsScored !== b.goalsScored) return b.goalsScored - a.goalsScored;
+      return a.rank - b.rank;
     });
 
     return thirdPlaceTeams;
