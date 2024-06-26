@@ -164,6 +164,11 @@ class League {
       teams.sort((a, b) => {
         if (a.points !== b.points) return b.points - a.points;
 
+        // Overall goal difference and goals scored
+        const goalDifferenceA = a.goalsScored - a.goalsAgainst;
+        const goalDifferenceB = b.goalsScored - b.goalsAgainst;
+        if (goalDifferenceA !== goalDifferenceB) return goalDifferenceB - goalDifferenceA;
+        if (a.goalsScored !== b.goalsScored) return b.goalsScored - a.goalsScored;
         // Head-to-head comparison
         const headToHeadMatches = this.matches.filter(
           (match) =>
@@ -210,12 +215,6 @@ class League {
           if (aGoals !== bGoals) return bGoals - aGoals;
           return a.rank - b.rank;
         }
-
-        // Overall goal difference and goals scored
-        const goalDifferenceA = a.goalsScored - a.goalsAgainst;
-        const goalDifferenceB = b.goalsScored - b.goalsAgainst;
-        if (goalDifferenceA !== goalDifferenceB) return goalDifferenceB - goalDifferenceA;
-        return b.goalsScored - a.goalsScored;
       }),
     );
   }
