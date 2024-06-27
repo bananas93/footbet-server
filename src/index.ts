@@ -26,7 +26,7 @@ AppDataSource.initialize()
       cors({
         allowedHeaders: ['sessionId', 'Content-Type'],
         exposedHeaders: ['sessionId, Content-Type'],
-        origin: ['https://bananas93.github.io/footbet-new'],
+        origin: ['bananas93.github.io'],
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         preflightContinue: true,
       }),
