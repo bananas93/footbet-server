@@ -24,6 +24,7 @@ AppDataSource.initialize()
     app.disable('x-powered-by');
     app.use(
       cors({
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
         origin: [
           'https://bananas93.github.io',
           'https://footbet.pp.ua',
