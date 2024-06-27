@@ -24,7 +24,12 @@ AppDataSource.initialize()
     app.disable('x-powered-by');
     app.use(
       cors({
-        origin: ['https://footbet.pp.ua', 'http://localhost:3000', 'http://localhost:8080'],
+        origin: [
+          'https://bananas93.github.io',
+          'https://footbet.pp.ua',
+          'http://localhost:3000',
+          'http://localhost:8080',
+        ],
       }),
     );
     app.options('/', cors());
