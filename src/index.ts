@@ -24,14 +24,10 @@ AppDataSource.initialize()
     app.disable('x-powered-by');
     app.use(
       cors({
-        allowedHeaders: ['sessionId', 'Content-Type'],
-        exposedHeaders: ['sessionId, Content-Type'],
-        origin: ['bananas93.github.io'],
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        preflightContinue: true,
+        origin: ['https://bananas93.github.io', 'http://localhost:3000', 'http://localhost:8080'],
       }),
     );
-    app.options('*', cors());
+    app.options('/', cors());
 
     const adminBuildPath = path.join(__dirname, 'admin/build');
     const clientBuildPath = path.join(__dirname, 'client/build');
