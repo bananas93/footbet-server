@@ -1,6 +1,7 @@
 import express, { type Express } from 'express';
 import 'dotenv/config';
 import cors from 'cors';
+import bodyParser from 'body-parser';
 import authRoute from './routes/auth.route';
 import userRoute from './routes/user.route';
 import tournamentRoute from './routes/tournament.route';
@@ -21,6 +22,7 @@ const port = process.env.PORT ?? '3000';
 AppDataSource.initialize()
   .then(() => {
     app.use(express.json());
+    app.use(bodyParser.json());
     app.disable('x-powered-by');
     app.use(
       cors({
