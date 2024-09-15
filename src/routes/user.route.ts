@@ -9,7 +9,7 @@ router.get('/', checkAuth, async (req, res) => {
   await UserController.getUserProfile(req, res);
 });
 
-router.get('/:userId', checkAuth, async (req, res) => {
+router.get('/:userId/:tournamentId', checkAuth, async (req, res) => {
   await UserController.getUserPublicProfile(req, res);
 });
 

@@ -33,6 +33,34 @@ export class Tournament {
   @Column({ nullable: true })
   knockoutRound: number;
 
+  @Column({
+    nullable: false,
+    default: 2,
+    transformer: {
+      to(value: number): number {
+        return value;
+      },
+      from(value: string): number {
+        return parseInt(value, 10);
+      },
+    },
+  })
+  directNextRound: number;
+
+  @Column({
+    nullable: false,
+    default: 1,
+    transformer: {
+      to(value: number): number {
+        return value;
+      },
+      from(value: string): number {
+        return parseInt(value, 10);
+      },
+    },
+  })
+  playoffRound: number;
+
   @Column({ default: false })
   thirdPlaceMatch: boolean;
 

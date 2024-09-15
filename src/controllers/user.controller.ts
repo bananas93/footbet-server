@@ -18,8 +18,8 @@ class UserController {
 
   async getUserPublicProfile(req: Request, res: Response): Promise<Response> {
     try {
-      const { userId } = req.params;
-      const user = await UserService.getUserPublicProfile(Number(userId));
+      const { userId, tournamentId } = req.params;
+      const user = await UserService.getUserPublicProfile(Number(userId), Number(tournamentId));
       return res.status(200).json(user);
     } catch (err: any) {
       if (err.message === 'User not found') {

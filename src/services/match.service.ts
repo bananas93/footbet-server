@@ -214,8 +214,6 @@ class MatchService {
           for (const prediction of predictions) {
             const result = PointsCalculator.calculatePointsForPrediction(updatedMatch, prediction);
 
-            console.log('result:', result);
-
             if (typeof result === 'number') {
               // Handle the case where result is 0 (or any other numeric value) if needed
               console.log('Points earned:', result);

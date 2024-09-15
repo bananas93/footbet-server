@@ -136,8 +136,6 @@ class TeamService {
       if (!room) {
         throw new Error('Room not found');
       }
-
-      console.log('room.creator.id', room);
       if (room.creator.id !== userId) {
         throw new Error('You are not authorized to update this room.');
       }

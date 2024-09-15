@@ -32,6 +32,7 @@ AppDataSource.initialize()
           'https://footbet.pp.ua',
           'http://localhost:3000',
           'http://localhost:8080',
+          'http://localhost:8081',
         ],
       }),
     );

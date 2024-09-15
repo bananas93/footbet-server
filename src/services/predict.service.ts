@@ -73,6 +73,7 @@ class PredictService {
         .addSelect('SUM(CASE WHEN predict.correctDifference <> 0 THEN 1 ELSE 0 END)', 'correctDifference')
         .addSelect('SUM(CASE WHEN predict.fivePlusGoals <> 0 THEN 1 ELSE 0 END)', 'fivePlusGoals')
         .addSelect('SUM(CASE WHEN predict.correctResult <> 0 THEN 1 ELSE 0 END)', 'correctResult')
+        .addSelect('COUNT(*)', 'totalMatches')
         .leftJoin('predict.user', 'user')
         .leftJoin('predict.match', 'match')
         .where('predict.tournamentId = :tournamentId', { tournamentId })
@@ -123,7 +124,10 @@ class PredictService {
       const predicts = await this.predictRepository.find({
         where: { userId },
         relations: {
-          match: true,
+          match: {
+            homeTeam: true, // Add this to include homeTeam relation
+            awayTeam: true, // Add this to include awayTeam relation
+          },
         },
         select: {
           id: true,
@@ -149,6 +153,54 @@ class PredictService {
           },
         },
       });
+      return predicts;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
+  async getPredictByUserIdAndTournamentId(userId: number, tournamentId: number): Promise<Predict[]> {
+    try {
+      // const predicts = await this.predictRepository.find({
+      //   where: { userId, tournamentId },
+      //   relations: {
+      //     match: {
+      //       homeTeam: true,
+      //       awayTeam: true,
+      //     },
+      //   },
+      //   select: {
+      //     id: true,
+      //     homeScore: true,
+      //     awayScore: true,
+      //     points: true,
+      //     correctScore: true,
+      //     correctDifference: true,
+      //     fivePlusGoals: true,
+      //     correctResult: true,
+      //     match: {
+      //       id: true,
+      //       stage: true,
+      //       status: true,
+      //       homeTeam: {
+      //         id: true,
+      //         name: true,
+      //       },
+      //       awayTeam: {
+      //         id: true,
+      //         name: true,
+      //       },
+      //       homeScore: true,
+      //       awayScore: true,
+      //     },
+      //   },
+      // });
+      // console.log('predicts', predicts.length);
+
+      const predicts = await this.predictRepository.query(
+        'SELECT * FROM predict WHERE userId = 1 AND tournamentId = 4',
+      );
+      console.log('predicts', predicts.length);
       return predicts;
     } catch (error: any) {
       throw new Error(error);

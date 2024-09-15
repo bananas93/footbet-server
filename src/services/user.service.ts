@@ -5,6 +5,7 @@ import { User } from '../entity/User';
 import PredictService from '../services/predict.service';
 import { checkPassword, createPasswordHash } from '../utils/userUtils';
 import { type Predict } from '../entity/Predict';
+import { calculateStats, type IStatistics } from '../utils/statistics';
 
 interface ChangePasswordFormValues {
   oldPassword: string;
@@ -41,7 +42,7 @@ class UserService {
     }
   }
 
-  async getUserPublicProfile(userId: number): Promise<{ user: User; predictions: Predict[] }> {
+  async getUserPublicProfile(userId: number, tournamentId: number): Promise<{ user: User; statistics: IStatistics }> {
     try {
       const user = await this.userRepository.findOne({
         where: { id: userId },
@@ -53,11 +54,34 @@ class UserService {
           avatar: true,
         },
       });
-      const predictions = await PredictService.getPredictByUserId(userId);
+      const predictions = await this.getUserStatistics(userId, tournamentId);
+      const statistics = calculateStats(predictions);
       if (!user) {
         throw new Error('User not found');
       }
-      return { user, predictions };
+      return { user, statistics };
+    } catch (error: any) {
+      throw new Error(error.message || 'An error occurred in the service layer');
+    }
+  }
+
+  async getUserStatistics(userId: number, tournamentId: number): Promise<Predict[]> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          nickname: true,
+          avatar: true,
+        },
+      });
+      const predictions = await PredictService.getPredictByUserIdAndTournamentId(userId, tournamentId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      return predictions;
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }
