@@ -16,6 +16,19 @@ class UserController {
     }
   }
 
+  async getUserPublicProfile(req: Request, res: Response): Promise<Response> {
+    try {
+      const { userId } = req.params;
+      const user = await UserService.getUserPublicProfile(Number(userId));
+      return res.status(200).json(user);
+    } catch (err: any) {
+      if (err.message === 'User not found') {
+        return res.status(404).json({ error: err.message });
+      }
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
   async editUserProfile(req: Request, res: Response): Promise<Response> {
     try {
       const userId = getUserIdFromToken(req.headers);

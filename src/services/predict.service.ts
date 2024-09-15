@@ -124,22 +124,28 @@ class PredictService {
         where: { userId },
         relations: {
           match: true,
-          user: true,
         },
         select: {
+          id: true,
+          homeScore: true,
+          awayScore: true,
+          points: true,
+          correctScore: true,
+          correctDifference: true,
+          fivePlusGoals: true,
+          correctResult: true,
           match: {
             id: true,
             stage: true,
-            groupTour: true,
             status: true,
-            groupName: true,
+            homeTeam: {
+              name: true,
+            },
+            awayTeam: {
+              name: true,
+            },
             homeScore: true,
             awayScore: true,
-            matchDate: true,
-          },
-          user: {
-            id: true,
-            name: true,
           },
         },
       });

@@ -2,7 +2,9 @@ import { type Repository } from 'typeorm';
 import bcrypt from 'bcryptjs';
 import AppDataSource from '../config/db';
 import { User } from '../entity/User';
+import PredictService from '../services/predict.service';
 import { checkPassword, createPasswordHash } from '../utils/userUtils';
+import { type Predict } from '../entity/Predict';
 
 interface ChangePasswordFormValues {
   oldPassword: string;
@@ -34,6 +36,28 @@ class UserService {
         throw new Error('User not found');
       }
       return user;
+    } catch (error: any) {
+      throw new Error(error.message || 'An error occurred in the service layer');
+    }
+  }
+
+  async getUserPublicProfile(userId: number): Promise<{ user: User; predictions: Predict[] }> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          nickname: true,
+          avatar: true,
+        },
+      });
+      const predictions = await PredictService.getPredictByUserId(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      return { user, predictions };
     } catch (error: any) {
       throw new Error(error.message || 'An error occurred in the service layer');
     }

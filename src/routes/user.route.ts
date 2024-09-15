@@ -9,6 +9,10 @@ router.get('/', checkAuth, async (req, res) => {
   await UserController.getUserProfile(req, res);
 });
 
+router.get('/:userId', checkAuth, async (req, res) => {
+  await UserController.getUserPublicProfile(req, res);
+});
+
 router.put('/', checkAuth, upload.single('avatar'), async (req, res) => {
   await UserController.editUserProfile(req, res);
 });
