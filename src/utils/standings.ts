@@ -142,7 +142,7 @@ class League {
   setTeamForm(group: string | number, team: string, result: string): void {
     this.table[group].forEach((item) => {
       if (item.team === team) {
-        item.form.push(result);
+        item.form.unshift(result);
         if (item.form.length > 5) item.form.shift();
       }
     });
