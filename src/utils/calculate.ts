@@ -70,7 +70,13 @@ class PointsCalculator {
     const totalGoalsMatch = match.homeScore + match.awayScore;
     const totalGoalsPrediction = prediction.homeScore + prediction.awayScore;
 
-    return totalGoalsMatch >= 5 && totalGoalsPrediction >= 5 ? 1 : 0;
+    if (totalGoalsMatch >= 5 && totalGoalsPrediction >= 5) {
+      const matchResult = this.determineMatchResult(match);
+      const predictionResult = this.determineMatchResult(prediction);
+      return matchResult === predictionResult ? 1 : 0;
+    }
+
+    return 0;
   }
 
   private determineMatchResult(entity: { homeScore?: number; awayScore?: number }): MatchResult {
